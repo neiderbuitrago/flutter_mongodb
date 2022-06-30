@@ -1,24 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mongodb/estado_getx/getx_productos.dart';
+import 'package:get/get.dart';
 
-class ListaMarcaGrupoImpuesto extends StatelessWidget {
-  const ListaMarcaGrupoImpuesto({
-    Key? key,
-    required this.marcasFiltradas,
-    this.esProducto = false,
-  }) : super(key: key);
-
-  final List marcasFiltradas;
-  final bool? esProducto;
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: SizedBox(
-        child: ListView.builder(
+listaMarcaGrupoImpuesto(bool esProducto) {
+  EstadoProducto estadoProducto = Get.find<EstadoProducto>();
+  return Expanded(
+    child: SizedBox(
+      child: Obx(
+        () => ListView.builder(
           // shrinkWrap: true,
-          itemCount: marcasFiltradas.length,
+          itemCount: estadoProducto.marcasFiltradas.length,
           itemBuilder: (context, index) {
-            final marca = marcasFiltradas[index];
+            final marca = estadoProducto.marcasFiltradas[index];
             return ListTile(
               hoverColor: Colors.white,
               focusColor: Colors.white,
@@ -26,28 +19,28 @@ class ListaMarcaGrupoImpuesto extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(30),
               ),
-              title: (esProducto ?? false)
+              title: (esProducto)
                   ? Text(
-                      marca.nombre,
+                      marca["nombre"],
                       // ' -' +
-                      // boxMarcas.getAt(marca.marcas).nombre,
+                      // boxMarcas.getAt(marca.marca)s).nombre,
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
                     )
                   : Text(
-                      marca.nombre,
+                      marca["nombre"],
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-              subtitle: (esProducto ?? false)
+              subtitle: (esProducto)
                   ? Text(
-                      marca.codigo +
+                      marca["codigo"] +
                           '    Existe: ' +
-                          marca.cantidad.toString() +
+                          marca["cantidad"].toString() +
                           '    Marca: ',
                       //  boxMarcas.get(marca.marcas).nombre,
                       style: const TextStyle(
@@ -57,7 +50,7 @@ class ListaMarcaGrupoImpuesto extends StatelessWidget {
                       ),
                     )
                   : null,
-              trailing: (esProducto ?? false)
+              trailing: (esProducto)
                   ? Text('\$' '${marca.precioVenta1}',
                       style: const TextStyle(
                         fontSize: 18,
@@ -65,13 +58,12 @@ class ListaMarcaGrupoImpuesto extends StatelessWidget {
                       ))
                   : null,
               onTap: () {
-                print('marca seleccionada: ${marca.codigo}');
-                Navigator.of(context).pop(marca.codigo.toString());
+                Navigator.of(context).pop(marca);
               },
             );
           },
         ),
       ),
-    );
-  }
+    ),
+  );
 }

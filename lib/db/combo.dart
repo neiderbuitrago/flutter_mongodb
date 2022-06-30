@@ -1,16 +1,16 @@
 // ignore_for_file: avoid_print, null_argument_to_non_null_type, prefer_typing_uninitialized_variables
 
-import 'package:flutter_mongodb/modelos/marcas.dart';
+import 'package:flutter_mongodb/modelos/combo.dart';
 import 'package:flutter_mongodb/utilidades.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
-class GruposDB {
+class ComboDB {
   static var db, coleccion;
 
   static Future<void> conectar() async {
     db = await Db.create(url);
     await db.open();
-    coleccion = await db.collection("grupos");
+    coleccion = await db.collection("combos");
   }
 
   static Future getParametro(String letras) async {
@@ -30,7 +30,8 @@ class GruposDB {
 
   static Future getId(ObjectId id) async {
     try {
-      var datos = await coleccion.find(where.id(id)).toList();
+      List datos = await coleccion.find(where.id(id)).toList();
+      if (datos.isEmpty) return null;
       return datos;
     } catch (e) {
       print(e);
@@ -38,25 +39,25 @@ class GruposDB {
     }
   }
 
-  static Future<void> insertar(MarcasGrupos marcas) async {
+  static Future<void> insertar(Combos valor) async {
     //comprovar si existe
 
-    if (await existeNombre(marcas.nombre)) {
+    if (await existeNombre(valor.nombre)) {
       try {
-        await coleccion.insertAll([marcas.toMap()]);
-        print("marca insertada");
+        await coleccion.insertAll([valor.toMap()]);
+        print("Combo insertado");
       } catch (e) {
         print(e);
       }
     }
   }
 
-  static Future<void> actualizar(MarcasGrupos marcas) async {
-    if (await existeNombre(marcas.nombre)) {
+  static Future<void> actualizar(Combos valor) async {
+    if (await existeNombre(valor.nombre)) {
       try {
         await coleccion.update(
-          where.eq("_id", marcas.id),
-          marcas.toMap(),
+          where.eq("_id", valor.id),
+          valor.toMap(),
         );
       } catch (e) {
         print(e);
@@ -64,10 +65,10 @@ class GruposDB {
     }
   }
 
-  static Future<void> eliminar(MarcasGrupos marcas) async {
+  static Future<void> eliminar(Combos valor) async {
     try {
       await coleccion.remove(
-        where.eq('_id', marcas.id),
+        where.eq('_id', valor.id),
       );
     } catch (e) {
       print(e);

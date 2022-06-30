@@ -1,6 +1,9 @@
 // ignore_for_file: avoid_print
 
 import 'package:flutter/material.dart';
+import 'package:flutter_mongodb/db/productos_mongo.dart';
+
+import 'package:get/get.dart';
 
 // class TextFormField1 extends StatelessWidget {
 //   @override
@@ -90,28 +93,27 @@ import 'package:flutter/material.dart';
 //   return codigo;
 // }
 
-// nuevoCodigostring(Box box) {
-//   int codigo = 1;
-//   bool codigoasignado = false;
-//   List codigos = box.keys.toList();
-//   print(codigos);
-//   if (codigos.isNotEmpty) {
-//     for (int i = 1; i <= codigos.length; i++) {
-//       // print('${codigos[i] is String}');
-//       if (!codigos.contains(i.toString())) {
-//         codigo = i;
-//         codigoasignado = true;
-//         break;
-//       }
-//       if (codigoasignado == false) {
-//         codigo = codigos.length + 1;
-//       }
-//     }
-//   } else {
-//     codigo = 1;
-//   }
-//   return codigo;
-// }
+Future<int> nuevoCodigostring() async {
+  int codigo = 1;
+  bool codigoasignado = false;
+  var codigos = await ProductosDB.getcodigoAll();
+  print(codigos);
+  if (codigos != null) {
+    for (int i = 1; i <= codigos.length; i++) {
+      if (!codigos.contains(i.toString())) {
+        codigo = i;
+        codigoasignado = true;
+        break;
+      }
+      if (codigoasignado == false) {
+        codigo = codigos.length + 1;
+      }
+    }
+  } else {
+    codigo = 1;
+  }
+  return codigo;
+}
 
 // // filtrarDatosString({required Box box, required String letra}) {
 // //   var producto = box.values.toList();
@@ -547,56 +549,56 @@ Padding elevatedButtonGuardar1({
   );
 }
 
-// class InformeFlotanteInferior extends StatelessWidget {
-//   const InformeFlotanteInferior({
-//     Key? key,
-//     required this.titleText,
-//     required this.messageText,
-//   }) : super(key: key);
-//   final String titleText;
-//   final String messageText;
+class InformeFlotanteInferior extends StatelessWidget {
+  const InformeFlotanteInferior({
+    Key? key,
+    required this.titleText,
+    required this.messageText,
+  }) : super(key: key);
+  final String titleText;
+  final String messageText;
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return SnackBar(
-//         content:
-//             informarInferior(titleText: titleText, messageText: messageText));
-//   }
-// }
+  @override
+  Widget build(BuildContext context) {
+    return SnackBar(
+        content:
+            informarInferior(titleText: titleText, messageText: messageText));
+  }
+}
 
-// informarInferior({required String titleText, required String messageText}) {
-//   Get.snackbar(
-//     '',
-//     '',
-//     titleText: Text(
-//       titleText,
-//       style: const TextStyle(color: Colors.black, fontSize: 20),
-//     ),
-//     messageText: Text(
-//       messageText,
-//       style: const TextStyle(
-//           color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
-//     ),
-//     icon: const Icon(Icons.error),
-//     backgroundColor: const Color.fromARGB(255, 185, 243, 253),
-//     colorText: Colors.black,
-//     borderRadius: 20,
-//     snackPosition: SnackPosition.BOTTOM,
-//     margin: const EdgeInsets.all(100),
-//     duration: const Duration(seconds: 2),
-//     borderColor: Colors.black,
-//     borderWidth: 1,
-//     forwardAnimationCurve: Curves.easeInOutCubicEmphasized,
-//     boxShadows: [
-//       BoxShadow(
-//         blurRadius: 20,
-//         // spreadRadius: 5.0,
-//         offset: const Offset(0, 48),
-//         color: Colors.black.withOpacity(0.2),
-//       ),
-//     ],
-//   );
-// }
+informarInferior({required String titleText, required String messageText}) {
+  Get.snackbar(
+    '',
+    '',
+    titleText: Text(
+      titleText,
+      style: const TextStyle(color: Colors.black, fontSize: 20),
+    ),
+    messageText: Text(
+      messageText,
+      style: const TextStyle(
+          color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+    ),
+    icon: const Icon(Icons.error),
+    backgroundColor: const Color.fromARGB(255, 185, 243, 253),
+    colorText: Colors.black,
+    borderRadius: 20,
+    snackPosition: SnackPosition.BOTTOM,
+    margin: const EdgeInsets.all(100),
+    duration: const Duration(seconds: 2),
+    borderColor: Colors.black,
+    borderWidth: 1,
+    forwardAnimationCurve: Curves.easeInOutCubicEmphasized,
+    boxShadows: [
+      BoxShadow(
+        blurRadius: 20,
+        // spreadRadius: 5.0,
+        offset: const Offset(0, 48),
+        color: Colors.black.withOpacity(0.2),
+      ),
+    ],
+  );
+}
 
 // nuevoCodigosMap(EstadoIdentificador estadoIdentificador) {
 //   int codigo = 1;

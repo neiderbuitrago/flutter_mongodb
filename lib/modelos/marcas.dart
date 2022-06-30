@@ -22,9 +22,19 @@ class MarcasGrupos {
     };
   }
 
+  MarcasGrupos.defecto()
+      : id = ObjectId(),
+        nombre = '',
+        sincronizado = '',
+        fecha = DateTime.now();
+
   MarcasGrupos.fromMap(Map<String, dynamic> map)
       : id = map['_id'],
         nombre = map['nombre'],
         sincronizado = map['sincronizado'],
         fecha = map['fecha'];
+
+  isEmpty() {
+    return (nombre.isEmpty && sincronizado.isEmpty);
+  }
 }

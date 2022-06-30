@@ -11,3 +11,12 @@ double numeroDecimal(String valor) {
   }
   return numero;
 }
+
+String quitarDecimales(double numero) {
+  double decimal = numero - numero.truncate();
+  return (decimal == 0) ? numero.truncate().toString() : numero.toString();
+}
+
+String enBlancoSiEsCero(double valor) {
+  return (valor == 0.0) ? "" : valor.toString();
+}

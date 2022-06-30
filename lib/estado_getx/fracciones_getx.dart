@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_mongodb/funciones_generales/numeros.dart';
 import 'package:get/get.dart';
+
+import '../funciones_generales/numeros.dart';
+import '../modelos/fracciones.dart';
 
 class EstadoVentaFraccionada extends GetxController {
   var costoGeneralProducto = ''.obs;
@@ -11,6 +13,8 @@ class EstadoVentaFraccionada extends GetxController {
     'Precio venta unitario',
     'Utilidad % ',
   ].obs;
+
+  Fracciones datosFracciones = {}.obs as Fracciones;
 
   late List controladoresFraccion =
       [for (var i = 0; i < 23; i++) TextEditingController()].obs;

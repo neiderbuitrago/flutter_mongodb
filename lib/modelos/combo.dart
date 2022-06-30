@@ -4,9 +4,7 @@ import 'combo_detalle.dart';
 
 class Combos {
   ObjectId id;
-
   String nombre;
-
   List<CombosDetalle> datosDescontar;
 
   String sincronizado;
@@ -52,5 +50,9 @@ class Combos {
       sincronizado: datosCombo['sincronizado'],
     );
     return combos;
+  }
+
+  isEmpty() {
+    return (nombre.isEmpty && datosDescontar.isEmpty);
   }
 }

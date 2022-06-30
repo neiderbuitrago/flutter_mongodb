@@ -1,9 +1,11 @@
 // ignore_for_file: avoid_print
 
 import 'package:flutter/material.dart';
+import 'package:flutter_mongodb/modelos/tarifa_impuestos.dart';
 import 'package:get/get.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
+import '../modelos/marcas.dart';
 import '../modelos/productos.dart';
 
 class EstadoProducto extends GetxController {
@@ -13,23 +15,26 @@ class EstadoProducto extends GetxController {
   var manejaCombos = false.obs;
   var manejaMulticodigos = false.obs;
   var manejaVentaXPeso = false.obs;
+  var manejaBodegas = false.obs;
+  var manejaInventario = false.obs;
   var estadoDelProducto = true.obs;
   var colorTextovalido = false.obs;
   var cambiarSwitch = false.obs;
   var idComboSeleccionado = 0.obs;
   var nombreComboSeleccionado = ''.obs;
   var seleccionTipoProducto = 'Activo'.obs;
-  //selecciones
-  var marcaSeleccionada = 0.obs;
-  var grupoSeleccionado = 0.obs;
-  var idImpuetoSeleccionado = 0.obs;
+  late MarcasGrupos marcaSeleccionada = <MarcasGrupos>{}.obs as MarcasGrupos;
+  late MarcasGrupos grupoSeleccionado = <MarcasGrupos>{}.obs as MarcasGrupos;
+  late Impuesto impuestoSeleccionado = <Impuesto>{}.obs as Impuesto;
   var comboSeleccionado = 0.obs;
-
+  var marcasFiltradas = [].obs;
   List<TextEditingController> controladores = <TextEditingController>[].obs;
   List<FocusNode> focusNode = <FocusNode>[].obs;
+  List<Widget> listadeTexfromFieldPrincipal = <Widget>[].obs;
   var formKey = GlobalKey<FormState>().obs;
 
-  var datosNuevosBitacora = {}.obs;
+  late Productos productoConsultado = {}.obs as Productos;
+  var nuevoEditar = true.obs;
 
   var productoNoEncontrados = Productos(
     id: ObjectId(),
@@ -61,7 +66,7 @@ class EstadoProducto extends GetxController {
     manejaIdentificador: false,
     manejaMulticodigo: false,
     manejaBodegas: false,
-    manejaInventario: true,
+    tipoProducto: 'Activo',
     comboId: ObjectId(),
     precioCompra: 0,
     precioVenta1: 0,
@@ -85,18 +90,23 @@ class EstadoProducto extends GetxController {
     cambiarSwitch.value = (index == 1 || index == 2) ? true : false;
   }
 
-  guardarIdMarcaGrupoImpuesto({required int index, required int value}) {
+  guardarIdMarcaGrupoImpuesto({required int index, required value}) {
     print('el codigo de la marca es $value');
-    switch (index) {
-      case 2:
-        marcaSeleccionada.value = value;
-        break;
-      case 3:
-        grupoSeleccionado.value = value;
-        break;
-      case 4:
-        idImpuetoSeleccionado.value = value;
-        break;
+    if (value != null) {
+      switch (index) {
+        case 2:
+          marcaSeleccionada = MarcasGrupos.fromMap(value);
+          controladores[2].text = marcaSeleccionada.nombre;
+          break;
+        case 3:
+          grupoSeleccionado = MarcasGrupos.fromMap(value);
+          controladores[3].text = grupoSeleccionado.nombre;
+          break;
+        case 4:
+          impuestoSeleccionado = Impuesto.fromMap(value);
+          controladores[4].text = impuestoSeleccionado.nombre;
+          break;
+      }
     }
   }
 
@@ -131,4 +141,30 @@ class EstadoProducto extends GetxController {
     'Venta X Peso',
     'Estado',
   ];
+
+  funtionHabilitar({required int index}) {
+    switch (index) {
+      case 22:
+        manejaVentaFraccionada.value = !manejaVentaFraccionada.value;
+        break;
+      case 23:
+        manejaVentaXCantidad.value = !manejaVentaXCantidad.value;
+        break;
+      case 24:
+        manejaIdentificador.value = !manejaIdentificador.value;
+        break;
+      case 25:
+        manejaCombos.value = !manejaCombos.value;
+        break;
+      case 26:
+        manejaMulticodigos.value = !manejaMulticodigos.value;
+        break;
+      case 27:
+        manejaVentaXPeso.value = !manejaVentaXPeso.value;
+        break;
+      case 28:
+        estadoDelProducto.value = !estadoDelProducto.value;
+        break;
+    }
+  }
 }

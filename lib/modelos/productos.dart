@@ -30,7 +30,7 @@ class Productos {
   final bool manejaIdentificador;
   final bool manejaMulticodigo;
   final bool manejaBodegas;
-  final bool manejaInventario;
+  final String tipoProducto;
   final ObjectId comboId;
   final double precioCompra;
   final double precioVenta1;
@@ -69,7 +69,7 @@ class Productos {
     required this.manejaIdentificador,
     required this.manejaMulticodigo,
     required this.manejaBodegas,
-    required this.manejaInventario,
+    required this.tipoProducto,
     required this.comboId,
     required this.precioCompra,
     required this.precioVenta1,
@@ -110,7 +110,7 @@ class Productos {
       "manejaIdentificador": manejaIdentificador,
       "manejaMulticodigo": manejaMulticodigo,
       "manejaBodegas": manejaBodegas,
-      "manejaInventario": manejaInventario,
+      "tipoProducto": tipoProducto,
       "comboId": comboId,
       "precioCompra": precioCompra,
       "precioVenta1": precioVenta1,
@@ -121,7 +121,7 @@ class Productos {
     };
   }
 
-  static Productos? fromMap(Map<String, dynamic> map) {
+  static Productos fromMap(map) {
     return Productos(
       id: map['_id'] as ObjectId,
       codigo: map['codigo'],
@@ -152,7 +152,7 @@ class Productos {
       manejaIdentificador: map['manejaIdentificador'],
       manejaMulticodigo: map['manejaMulticodigo'],
       manejaBodegas: map['manejaBodegas'],
-      manejaInventario: map['manejaInventario'],
+      tipoProducto: map['tipoProducto'],
       comboId: map['comboId'] as ObjectId,
       precioCompra: map['precioCompra'],
       precioVenta1: map['precioVenta1'],
@@ -161,5 +161,9 @@ class Productos {
       sincronizado: map['sincronizado'],
       fechaCreacion: map['fechaCreacion'],
     );
+  }
+
+  isEmpty() {
+    return (nombre.isEmpty && sincronizado.isEmpty && codigo.isEmpty);
   }
 }

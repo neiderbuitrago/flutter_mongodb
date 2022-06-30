@@ -1,24 +1,24 @@
-// ignore_for_file: avoid_print, null_argument_to_non_null_type, prefer_typing_uninitialized_variables
+// ignore_for_file: avoid_print
 
-import 'package:flutter_mongodb/modelos/marcas.dart';
 import 'package:flutter_mongodb/utilidades.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
-class GruposDB {
+import '../modelos/identificador.dart';
+
+class IdentificadorDB {
   static var db, coleccion;
 
   static Future<void> conectar() async {
     db = await Db.create(url);
     await db.open();
-    coleccion = await db.collection("grupos");
+    coleccion = await db.collection("identificadores");
   }
 
-  static Future getParametro(String letras) async {
+  static Future getParametro(ObjectId idPadre) async {
     try {
       var datos = await coleccion
-          .find(where
-              .match("nombre", letras, caseInsensitive: true)
-              .sortBy("nombre", descending: false))
+          .find(
+              where.eq("idPadre", idPadre).sortBy("detalle", descending: false))
           .toList();
 
       return datos;
@@ -38,12 +38,12 @@ class GruposDB {
     }
   }
 
-  static Future<void> insertar(MarcasGrupos marcas) async {
+  static Future<void> insertar(IdentificadorDetalle valor) async {
     //comprovar si existe
 
-    if (await existeNombre(marcas.nombre)) {
+    if (await existeNombre(valor)) {
       try {
-        await coleccion.insertAll([marcas.toMap()]);
+        await coleccion.insertAll([valor.toMap()]);
         print("marca insertada");
       } catch (e) {
         print(e);
@@ -51,12 +51,12 @@ class GruposDB {
     }
   }
 
-  static Future<void> actualizar(MarcasGrupos marcas) async {
-    if (await existeNombre(marcas.nombre)) {
+  static Future<void> actualizar(IdentificadorDetalle valor) async {
+    if (await existeNombre(valor)) {
       try {
         await coleccion.update(
-          where.eq("_id", marcas.id),
-          marcas.toMap(),
+          where.eq("_id", valor.id),
+          valor.toMap(),
         );
       } catch (e) {
         print(e);
@@ -64,10 +64,10 @@ class GruposDB {
     }
   }
 
-  static Future<void> eliminar(MarcasGrupos marcas) async {
+  static Future<void> eliminar(IdentificadorDetalle valor) async {
     try {
       await coleccion.remove(
-        where.eq('_id', marcas.id),
+        where.eq('_id', valor.id),
       );
     } catch (e) {
       print(e);
@@ -75,12 +75,12 @@ class GruposDB {
   }
 
   //comprobar si el nombre existe
-  static Future<bool> existeNombre(String nombre) async {
+  static Future<bool> existeNombre(IdentificadorDetalle nombre) async {
     try {
       final existe = await coleccion
-          .find(where
-              .eq("nombre", nombre)
-              .or(where.eq("nombre", nombre.toLowerCase())))
+          .find(where.eq("idPadre", nombre.idPadre).or(where
+              .eq("nombre", nombre.nombre)
+              .or(where.eq("identificador", nombre.identificador))))
           .toList();
       return (existe.isEmpty) ? true : false;
     } catch (e) {

@@ -1,46 +1,46 @@
 // ignore_for_file: avoid_print
 
-// import 'package:flutter/material.dart';
-// import 'package:get/get.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-// import '../estados_getX/getx_combos.dart';
+import '../../estado_getx/getx_productos.dart';
+import '../../estado_getx/venta_x_cantidad_getx.dart';
 
-// Row encabezadoSencillo({
-//   required BuildContext context,
-//   required double anchoLista,
-//   required String titulo,
-// }) {
-//   return Row(
-//     children: [
-//       IconButton(
-//         onPressed: () {
-//           Navigator.of(context).pop();
-//         },
-//         icon: const Icon(Icons.arrow_back_ios),
-//       ),
-//       SizedBox(
-//         width: anchoLista - 100,
-//         child: Column(
-//           children: [
-//             Text(
-//               titulo,
-//               style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-//             ),
-//           ],
-//         ),
-//       ),
-//     ],
-//   );
-// }
+Row encabezadoSencillo({
+  required BuildContext context,
+  required double anchoLista,
+  required String titulo,
+}) {
+  return Row(
+    children: [
+      IconButton(
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        icon: const Icon(Icons.arrow_back_ios),
+      ),
+      SizedBox(
+        width: anchoLista - 100,
+        child: Column(
+          children: [
+            Text(
+              titulo,
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
+}
 
 // Container encabezado({
 //   required BuildContext context,
 //   required double anchoLista,
 //   // required Function cambioDetalleNombre,
-//   required VariablesFunciones variablesFunciones,
 // }) {
 //   EstadoProducto estadoProducto = Get.find<EstadoProducto>();
-//   late EstadoCombos estadoCombos = Get.find<EstadoCombos>();
+//   // late EstadoCombos estadoCombos = Get.find<EstadoCombos>();
 //   return Container(
 //     decoration: BoxDecoration(
 //       boxShadow: [
@@ -96,94 +96,94 @@
 //   );
 // }
 
-// SizedBox cardgeneral(
-//     {required List<Widget> children, required Color colorbordes}) {
-//   return SizedBox(
-//     height: 200,
-//     width: 300,
-//     child: Card(
-//       shadowColor: colorbordes,
-//       elevation: 10,
-//       shape: RoundedRectangleBorder(
-//         borderRadius: const BorderRadius.all(
-//           Radius.circular(20.0),
-//         ),
-//         side: BorderSide(
-//           color: colorbordes,
-//           width: 2,
-//         ),
-//       ),
-//       color: Colors.white,
-//       child: Column(
-//         mainAxisAlignment: MainAxisAlignment.center,
-//         children: children,
-//       ),
-//     ),
-//   );
-// }
+SizedBox cardgeneral(
+    {required List<Widget> children, required Color colorbordes}) {
+  return SizedBox(
+    height: 200,
+    width: 300,
+    child: Card(
+      shadowColor: colorbordes,
+      elevation: 10,
+      shape: RoundedRectangleBorder(
+        borderRadius: const BorderRadius.all(
+          Radius.circular(20.0),
+        ),
+        side: BorderSide(
+          color: colorbordes,
+          width: 2,
+        ),
+      ),
+      color: Colors.white,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: children,
+      ),
+    ),
+  );
+}
 
-// calcularGanancias({
-//   required int index,
-// }) {
-//   final EstadoVentaXCantidad estadoVentaXCantidad =
-//       Get.find<EstadoVentaXCantidad>();
-//   final EstadoProducto estadoProducto = Get.find<EstadoProducto>();
-//   double costo = comprovarSihayNumero(estadoProducto.controladores[5].text);
-//   double desde = comprovarSihayNumero(
-//       estadoVentaXCantidad.controladoresVentaXCantidad[index - 2].text);
-//   double hasta = comprovarSihayNumero(
-//       estadoVentaXCantidad.controladoresVentaXCantidad[index - 1].text);
-//   double precio = comprovarSihayNumero(
-//       estadoVentaXCantidad.controladoresVentaXCantidad[index].text);
+calcularGanancias({
+  required int index,
+}) {
+  final EstadoVentaXCantidad estadoVentaXCantidad =
+      Get.find<EstadoVentaXCantidad>();
+  final EstadoProducto estadoProducto = Get.find<EstadoProducto>();
+  double costo = comprovarSihayNumero(estadoProducto.controladores[5].text);
+  double desde = comprovarSihayNumero(
+      estadoVentaXCantidad.controladoresVentaXCantidad[index - 2].text);
+  double hasta = comprovarSihayNumero(
+      estadoVentaXCantidad.controladoresVentaXCantidad[index - 1].text);
+  double precio = comprovarSihayNumero(
+      estadoVentaXCantidad.controladoresVentaXCantidad[index].text);
 
-//   if (desde != 0 && hasta != 0 && precio != 0) {
-//     double utilidadPesos = (precio - costo);
-//     double porcentaje = (utilidadPesos / costo);
-//     estadoVentaXCantidad.controladoresVentaXCantidad[index + 1].text =
-//         (porcentaje * 100).toString();
-//   }
-// }
+  if (desde != 0 && hasta != 0 && precio != 0) {
+    double utilidadPesos = (precio - costo);
+    double porcentaje = (utilidadPesos / costo);
+    estadoVentaXCantidad.controladoresVentaXCantidad[index + 1].text =
+        (porcentaje * 100).toString();
+  }
+}
 
-// double comprovarSihayNumero(String valor) {
-//   return (valor == "") ? 0.00 : double.parse(valor);
-// }
+double comprovarSihayNumero(String valor) {
+  return (valor == "") ? 0.00 : double.parse(valor);
+}
 
-// validarRangos({required VariablesFunciones variablesFunciones}) {
-//   final EstadoVentaXCantidad estadoVentaXCantidad =
-//       Get.find<EstadoVentaXCantidad>();
-//   valor(index1) {
-//     String valor =
-//         estadoVentaXCantidad.controladoresVentaXCantidad[index1].text;
-//     return (valor == "") ? 0.00 : double.parse(valor);
-//   }
+validarRangos() {
+  final EstadoVentaXCantidad estadoVentaXCantidad =
+      Get.find<EstadoVentaXCantidad>();
+  valor(index1) {
+    String valor =
+        estadoVentaXCantidad.controladoresVentaXCantidad[index1].text;
+    return (valor == "") ? 0.00 : double.parse(valor);
+  }
 
-//   List<int> listaDeIndex = [1, 4, 5, 8, 9, 12, 13];
+  List<int> listaDeIndex = [1, 4, 5, 8, 9, 12, 13];
 
-//   for (int i = 0; i < listaDeIndex.length; i++) {
-//     int index = listaDeIndex[i];
+  for (int i = 0; i < listaDeIndex.length; i++) {
+    int index = listaDeIndex[i];
 
-//     bool continuar = true;
-//     estadoVentaXCantidad.datosValidosVentaXCantidad.forEach((key, value) {
-//       print('key $key value $value');
-//       if (key < index) {
-//         if (value == false) {
-//           continuar = false;
-//         }
-//       }
-//     });
+    bool continuar = true;
+    estadoVentaXCantidad.datosValidosVentaXCantidad.forEach((key, value) {
+      print('key $key value $value');
+      if (key < index) {
+        if (value == false) {
+          continuar = false;
+        }
+      }
+    });
 
-//     if (continuar) {
-//       if (index == 4 || index == 8 || index == 12) {
-//         estadoVentaXCantidad.changeValue(
-//             index, (valor(index) > valor(index - 3)));
-//       }
-//       estadoVentaXCantidad.changeValue(
-//           index, (valor(index) > valor(index - 1)));
-//     } else {
-//       estadoVentaXCantidad.changeValue(index, false);
-//     }
-//   }
-//   estadoVentaXCantidad.datosValidosVentaXCantidad.forEach((key, value) {
-//     print('key $key value $value');
-//   });
-// }
+    if (continuar) {
+      if (index == 4 || index == 8 || index == 12) {
+        estadoVentaXCantidad.changeValue(
+            index, (valor(index) > valor(index - 3)));
+      }
+      estadoVentaXCantidad.changeValue(
+          index, (valor(index) > valor(index - 1)));
+    } else {
+      estadoVentaXCantidad.changeValue(index, false);
+    }
+  }
+  estadoVentaXCantidad.datosValidosVentaXCantidad.forEach((key, value) {
+    print('key $key value $value');
+  });
+}

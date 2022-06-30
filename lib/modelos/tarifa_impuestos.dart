@@ -29,4 +29,14 @@ class Impuesto {
       sincronizado: map['sincronizado'],
     );
   }
+
+  Impuesto.defecto()
+      : id = ObjectId(),
+        nombre = '',
+        valor = 0,
+        sincronizado = '';
+
+  isEmpty() {
+    return (nombre.isEmpty && sincronizado.isEmpty);
+  }
 }

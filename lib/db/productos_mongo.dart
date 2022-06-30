@@ -1,7 +1,9 @@
 // ignore_for_file: avoid_print, prefer_typing_uninitialized_variables, null_argument_to_non_null_type
 
-import 'package:flutter_mongodb/modelos/marcas.dart';
+import 'package:flutter_mongodb/estado_getx/getx_productos.dart';
+import 'package:flutter_mongodb/modelos/productos.dart';
 import 'package:flutter_mongodb/utilidades.dart';
+import 'package:get/get.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
 class ProductosDB {
@@ -13,7 +15,8 @@ class ProductosDB {
     coleccionProductos = await db.collection("productos");
   }
 
-  static Future<List<Map<String, dynamic>>> getnombre(String letras) async {
+//consultar por silaba contenida en el nombre
+  static Future getnombre(String letras) async {
     try {
       var datos = await coleccionProductos
           .find(where
@@ -28,14 +31,26 @@ class ProductosDB {
     }
   }
 
-  static Future<List<Map<String, dynamic>>> getcodigo(String letras) async {
+//consultar por el codigo de barras
+  static Future getcodigo(String letras) async {
     try {
-      var datos = await coleccionProductos
-          .findOne(where
-              .eq("codigo", letras)
-              .or(where.eq("codigo", letras.toLowerCase())))
-          .toList();
+      List datos =
+          await coleccionProductos.find(where.eq("codigo", letras)).toList();
+      if (datos.isEmpty) {
+        return null;
+      } else {
+        return datos;
+      }
+    } catch (e) {
+      print("error al consultar codigo de barras $e");
+      return Future.value();
+    }
+  }
 
+//consultar todos los codigos de barras
+  static Future getcodigoAll() async {
+    try {
+      var datos = await coleccionProductos.find().fields(["codigo"]).toList();
       return datos;
     } catch (e) {
       print(e);
@@ -59,20 +74,20 @@ class ProductosDB {
   //   }
   // }
 
-  static Future<void> insertar(MarcasGrupos datos) async {
+  static Future<void> insertar(Productos datos) async {
     //comprovar si existe
 
     if (await existeNombre(datos.nombre)) {
       try {
         await coleccionProductos.insertAll([datos.toMap()]);
-        print("marca insertada");
+        print("Producto insertada");
       } catch (e) {
         print(e);
       }
     }
   }
 
-  static Future<void> actualizar(MarcasGrupos datos) async {
+  static Future<void> actualizar(Productos datos) async {
     if (await existeNombre(datos.nombre)) {
       try {
         await coleccionProductos.update(
@@ -85,7 +100,7 @@ class ProductosDB {
     }
   }
 
-  static Future<void> eliminar(MarcasGrupos datos) async {
+  static Future<void> eliminar(Productos datos) async {
     try {
       await coleccionProductos.remove(
         where.eq('_id', datos.id),

@@ -1,24 +1,24 @@
 // ignore_for_file: avoid_print, null_argument_to_non_null_type, prefer_typing_uninitialized_variables
 
-import 'package:flutter_mongodb/modelos/marcas.dart';
+import 'package:flutter_mongodb/modelos/multicodigo.dart';
 import 'package:flutter_mongodb/utilidades.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
-class GruposDB {
+class MulticodigoDB {
   static var db, coleccion;
 
   static Future<void> conectar() async {
     db = await Db.create(url);
     await db.open();
-    coleccion = await db.collection("grupos");
+    coleccion = await db.collection("Multicodigo");
   }
 
-  static Future getParametro(String letras) async {
+  static Future getParametro(ObjectId idProducto) async {
     try {
       var datos = await coleccion
           .find(where
-              .match("nombre", letras, caseInsensitive: true)
-              .sortBy("nombre", descending: false))
+              .eq("idProducto", idProducto)
+              .sortBy("detalle", descending: false))
           .toList();
 
       return datos;
@@ -30,7 +30,7 @@ class GruposDB {
 
   static Future getId(ObjectId id) async {
     try {
-      var datos = await coleccion.find(where.id(id)).toList();
+      var datos = await coleccion.findOne(where.id(id));
       return datos;
     } catch (e) {
       print(e);
@@ -38,12 +38,12 @@ class GruposDB {
     }
   }
 
-  static Future<void> insertar(MarcasGrupos marcas) async {
+  static Future<void> insertar(Multicodigo valor) async {
     //comprovar si existe
 
-    if (await existeNombre(marcas.nombre)) {
+    if (await existeNombre(valor)) {
       try {
-        await coleccion.insertAll([marcas.toMap()]);
+        await coleccion.insertAll([valor.toMap()]);
         print("marca insertada");
       } catch (e) {
         print(e);
@@ -51,12 +51,12 @@ class GruposDB {
     }
   }
 
-  static Future<void> actualizar(MarcasGrupos marcas) async {
-    if (await existeNombre(marcas.nombre)) {
+  static Future<void> actualizar(Multicodigo valor) async {
+    if (await existeNombre(valor)) {
       try {
         await coleccion.update(
-          where.eq("_id", marcas.id),
-          marcas.toMap(),
+          where.eq("_id", valor.id),
+          valor.toMap(),
         );
       } catch (e) {
         print(e);
@@ -64,10 +64,10 @@ class GruposDB {
     }
   }
 
-  static Future<void> eliminar(MarcasGrupos marcas) async {
+  static Future<void> eliminar(Multicodigo valor) async {
     try {
       await coleccion.remove(
-        where.eq('_id', marcas.id),
+        where.eq('_id', valor.id),
       );
     } catch (e) {
       print(e);
@@ -75,12 +75,12 @@ class GruposDB {
   }
 
   //comprobar si el nombre existe
-  static Future<bool> existeNombre(String nombre) async {
+  static Future<bool> existeNombre(Multicodigo nombre) async {
     try {
       final existe = await coleccion
-          .find(where
-              .eq("nombre", nombre)
-              .or(where.eq("nombre", nombre.toLowerCase())))
+          .find(where.eq("codigo", nombre.codigo).or(where
+              .eq("idProducto", nombre.idProducto)
+              .or(where.eq("detalle", nombre.detalle))))
           .toList();
       return (existe.isEmpty) ? true : false;
     } catch (e) {

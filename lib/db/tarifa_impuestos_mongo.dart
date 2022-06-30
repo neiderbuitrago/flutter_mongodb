@@ -6,17 +6,18 @@ import '../modelos/tarifa_impuestos.dart';
 import '../utilidades.dart';
 
 class TarifaImpuestosDB {
-  static var db, coleccionTarImpuestos;
+  // ignore: prefer_typing_uninitialized_variables
+  static var db, coleccion;
 
   static Future<void> conectar() async {
     db = await Db.create(url);
     await db.open();
-    coleccionTarImpuestos = await db.collection("tarifa_impuestos");
+    coleccion = await db.collection("tarifa_impuestos");
   }
 
-  static Future<List<Map<String, dynamic>>> getParametro(String letras) async {
+  static Future getParametro(String letras) async {
     try {
-      var datos = await coleccionTarImpuestos
+      var datos = await coleccion
           .find(where
               .match("nombre", letras, caseInsensitive: true)
               .sortBy("nombre", descending: false))
@@ -29,10 +30,20 @@ class TarifaImpuestosDB {
     }
   }
 
+  static Future getId(ObjectId id) async {
+    try {
+      var datos = await coleccion.find(where.id(id)).toList();
+      return datos;
+    } catch (e) {
+      print(e);
+      return Future.value();
+    }
+  }
+
   static Future<void> insertar(Impuesto tarifaImpuestos) async {
     if (await existeNombre(tarifaImpuestos)) {
       try {
-        await coleccionTarImpuestos.insertAll([tarifaImpuestos.toMap()]);
+        await coleccion.insertAll([tarifaImpuestos.toMap()]);
         print("tarifa impuestos insertada");
       } catch (e) {
         print(e);
@@ -43,7 +54,7 @@ class TarifaImpuestosDB {
   static Future actualizar(Impuesto tarifaImpuestos) async {
     if (await existeNombre(tarifaImpuestos)) {
       try {
-        var a = await coleccionTarImpuestos.update(
+        var a = await coleccion.update(
           where.eq("_id", tarifaImpuestos.id),
           tarifaImpuestos.toMap(),
         );
@@ -57,7 +68,7 @@ class TarifaImpuestosDB {
 
   static Future<void> eliminar(Impuesto tarifaImpuestos) async {
     try {
-      await coleccionTarImpuestos.remove(
+      await coleccion.remove(
         where.eq('_id', tarifaImpuestos.id),
       );
     } catch (e) {
@@ -67,7 +78,7 @@ class TarifaImpuestosDB {
 
   static Future<bool> existeNombre(Impuesto impuesto) async {
     try {
-      final existe = await coleccionTarImpuestos
+      final existe = await coleccion
           .find(where
               .match("nombre", impuesto.nombre, caseInsensitive: true)
               .and(where.eq("valor", impuesto.valor)))

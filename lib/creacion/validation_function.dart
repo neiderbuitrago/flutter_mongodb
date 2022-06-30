@@ -1,6 +1,6 @@
-// import 'package:get/get.dart';
+import 'package:get/get.dart';
 
-// import 'estados_getX/getx_combos.dart';
+import '../estado_getx/combos_getx.dart';
 
 // double numeroDecimal(String valor) {
 //   //esta funcion controla que no se inserte multiples puntos decimales
@@ -15,13 +15,14 @@
 //   return numero;
 // }
 
-// // tomar la parte decimal de un numero
-// String quitarDecimales(double numero) {
-//   double decimal = numero - numero.truncate();
-//   return (decimal == 0) ? numero.truncate().toString() : numero.toString();
-// }
+// tomar la parte decimal de un numero
 
-// int indiceReverse(int index) {
-//   final EstadoCombos estadoCombos = Get.find<EstadoCombos>();
-//   return (estadoCombos.controlleresCombosDetalle.length - 1) - index;
-// }
+String quitarDecimales(double numero) {
+  double decimal = numero - numero.truncate();
+  return (decimal == 0) ? numero.truncate().toString() : numero.toString();
+}
+
+int indiceReverse(int index) {
+  final EstadoCombos estadoCombos = Get.find<EstadoCombos>();
+  return (estadoCombos.controlleresCombosDetalle.length - 1) - index;
+}

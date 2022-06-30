@@ -13,7 +13,7 @@ class MarcaDB {
     coleccionMarca = await db.collection("marcas");
   }
 
-  static Future<List<Map<String, dynamic>>> getParametro(String letras) async {
+  static Future getParametro(String letras) async {
     try {
       var datos = await coleccionMarca
           .find(where
@@ -21,6 +21,16 @@ class MarcaDB {
               .sortBy("nombre", descending: false))
           .toList();
 
+      return datos;
+    } catch (e) {
+      print(e);
+      return Future.value();
+    }
+  }
+
+  static Future getId(ObjectId id) async {
+    try {
+      var datos = await coleccionMarca.find(where.id(id)).toList();
       return datos;
     } catch (e) {
       print(e);

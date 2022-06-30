@@ -1,17 +1,27 @@
 // ignore_for_file: avoid_print
 
 import 'package:flutter/material.dart';
-import 'package:flutter_mongodb/creacion/tarifas_impuesto/creacion_impuesto.dart';
+import 'package:flutter_mongodb/db/combo.dart';
+
 import 'package:flutter_mongodb/db/empresa_mongo.dart';
+import 'package:flutter_mongodb/db/identificadores.dart';
+import 'package:flutter_mongodb/db/multicodigo.dart';
 import 'package:flutter_mongodb/estado_getx/getx_marcas.dart';
+import 'package:flutter_mongodb/estado_getx/getx_productos.dart';
+
 import 'package:get/get.dart';
-import 'Productos/creacion_productos.dart';
+
 import 'creacion/grupos/creacion_grupos.dart';
 import 'creacion/marcas/creacion_marca.dart';
+import 'creacion/productos/creacion_productos.dart';
+import 'creacion/tarifa_impuestos/creacion_impuesto.dart';
+import 'db/fracciones.dart';
 import 'db/grupos_mongo.dart';
 import 'db/marcas_mongo.dart';
 import 'db/productos_mongo.dart';
-import 'db/tarifa_impuestos.dart';
+import 'db/tarifa_impuestos_mongo.dart';
+import 'estado_getx/combos_getx.dart';
+import 'estado_getx/fracciones_getx.dart';
 import 'estado_getx/getx_grupos.dart';
 
 void main() async {
@@ -21,6 +31,11 @@ void main() async {
   await GruposDB.conectar();
   await TarifaImpuestosDB.conectar();
   await ProductosDB.conectar();
+  await MulticodigoDB.conectar();
+  await ComboDB.conectar();
+  await IdentificadorDB.conectar();
+  await FraccionesDB.conectar();
+
   runApp(const MyApp());
 }
 
@@ -34,6 +49,11 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final EstadoGrupos estadoGrupos = Get.put(EstadoGrupos());
   final EstadoMarcas estadoMarcas = Get.put(EstadoMarcas());
+  final EstadoProducto estadoProductos = Get.put(EstadoProducto());
+  final EstadoCombos estadoCombos = Get.put(EstadoCombos());
+  final EstadoVentaFraccionada estadoVentaFraccionada =
+      Get.put(EstadoVentaFraccionada());
+
   int _selectedIndex = 0;
   @override
   void initState() {
@@ -45,6 +65,10 @@ class _MyAppState extends State<MyApp> {
   void dispose() async {
     estadoGrupos.dispose();
     estadoMarcas.dispose();
+    estadoProductos.dispose();
+    estadoCombos.dispose();
+    estadoVentaFraccionada.dispose();
+
     super.dispose();
   }
 
