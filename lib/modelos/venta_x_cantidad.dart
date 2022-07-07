@@ -1,7 +1,7 @@
 import 'package:mongo_dart/mongo_dart.dart';
 
 class VentaXCantidad {
-  ObjectId idPadre;
+  ObjectId id;
   double desde1;
   double hasta1;
   double precio1;
@@ -16,7 +16,7 @@ class VentaXCantidad {
   double precio4;
   String sincronizado;
   VentaXCantidad({
-    required this.idPadre,
+    required this.id,
     this.desde1 = 0.0,
     this.hasta1 = 0.0,
     this.precio1 = 0.0,
@@ -35,7 +35,7 @@ class VentaXCantidad {
   //
   Map<String, dynamic> toMap() {
     return {
-      'idPadre': idPadre,
+      '_id': id,
       'desde1': desde1,
       'hasta1': hasta1,
       'precio1': precio1,
@@ -54,7 +54,7 @@ class VentaXCantidad {
 
   factory VentaXCantidad.fromMap(Map<String, dynamic> map) {
     return VentaXCantidad(
-      idPadre: map['idPadre'],
+      id: map['_id'],
       desde1: map['desde1'],
       hasta1: map['hasta1'],
       precio1: map['precio1'],

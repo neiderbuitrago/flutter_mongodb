@@ -6,22 +6,24 @@ import 'package:flutter_mongodb/db/productos_mongo.dart';
 import 'package:get/get.dart';
 import '../../estado_getx/combos_getx.dart';
 import '../../estado_getx/fracciones_getx.dart';
-import '../../estado_getx/getx_productos.dart';
+import '../../estado_getx/productos_getx.dart';
 import '../../estado_getx/identificadores.dart';
 import '../../estado_getx/multicodigo_getx.dart';
 import '../../estado_getx/venta_x_cantidad_getx.dart';
+import '../../funciones_generales/strings.dart';
+import '../../modelos/combo.dart';
 import '../combos/cuadro_flotante_combos.dart';
-import '../crear_fracciones/cuadro_flotante_venta_fraccionada.dart';
+import '../fracciones/cuadro_flotante_venta_fraccionada.dart';
 import '../identificadores/creacion_identificador.dart';
-import '../identificadores/widget.dart';
 import '../multicodigos/creacion_multicodigos.dart';
+import '../multicodigos/lista_multicodigo.dart';
 import '../venta_x_cantidad/cuadro_flotante_venta_x_cantidad.dart';
 import '../widget.dart';
 import 'cuadro_flotante_consulta_productos.dart';
 import 'llenar_datos.dart';
 import 'widget.dart';
 
-//CONSTRUIR UN FUTUREBUILDER PARA LA CONSULTA DE PRODUCTOS
+//CONSTRUIR UN FUTURE BUILDER PARA LA CONSULTA DE PRODUCTOS
 
 class TextFormFieldProducto extends StatefulWidget {
   @override
@@ -43,7 +45,7 @@ class _TextFormFieldProductoState extends State<TextFormFieldProducto> {
   final EstadoIdentificador estadoIdentificador =
       Get.find<EstadoIdentificador>();
   final EstadoProducto estadoProducto = Get.find<EstadoProducto>();
-  String _texto = '';
+  final String _texto = '';
 
   bool comprovarSiHayValores(
     int cuantosCamposExaminara,
@@ -65,6 +67,9 @@ class _TextFormFieldProductoState extends State<TextFormFieldProducto> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // executes after build
     });
+
+    campoEnMayusculas(controller: estadoProducto.controladores[0]);
+    campoEnMayusculas(controller: estadoProducto.controladores[1]);
   }
 
   actualizar() {
@@ -103,7 +108,6 @@ class _TextFormFieldProductoState extends State<TextFormFieldProducto> {
     //     );
     //   }
     // }
-
     //);
   }
 
@@ -163,7 +167,7 @@ class _TextFormFieldProductoState extends State<TextFormFieldProducto> {
                           if (value != null) {
                             //   estadoProducto.controladores[1].text = value.nombre;
                             llenarDatos(
-                              codigo: value,
+                              codigo: value.codigo,
                             );
                           }
                         },
@@ -215,7 +219,7 @@ class _TextFormFieldProductoState extends State<TextFormFieldProducto> {
       validator: (widget.index < 8)
           ? (value) {
               if (value!.isEmpty) {
-                return 'Este nombreCampo es obligatorio';
+                return null;
               }
               return null;
             }
@@ -331,7 +335,7 @@ class _TextFormFieldProductoState extends State<TextFormFieldProducto> {
         ),
       ),
       label: (widget.index == 25)
-          ? (estadoProducto.idComboSeleccionado.value == 0)
+          ? (!estadoProducto.manejaCombos.value)
               ? Text(
                   estadoProducto.campos[widget.index],
                   style: const TextStyle(
@@ -343,7 +347,7 @@ class _TextFormFieldProductoState extends State<TextFormFieldProducto> {
                 )
               : ColocarTextoAdicional(
                   primerTexto: estadoProducto.campos[widget.index],
-                  segundoTexto: estadoProducto.nombreComboSeleccionado.value,
+                  segundoTexto: estadoProducto.comboSeleccionado.nombre,
                 )
           : (widget.index == 28)
               ? ColocarTextoAdicional(
@@ -419,12 +423,10 @@ class _TextFormFieldProductoState extends State<TextFormFieldProducto> {
                           ).then(
                             (value) {
                               if (estadoIdentificador
-                                  .datosIdentificador.isEmpty) {
+                                  .mapIdentificador.isEmpty) {
                                 estadoProducto.funtionHabilitar(
                                     index: widget.index);
-                              } else {
-                                guardarIdentificadores();
-                              }
+                              } else {}
                             },
                           );
                         },
@@ -432,34 +434,26 @@ class _TextFormFieldProductoState extends State<TextFormFieldProducto> {
                     }
                   : (widget.index == 25)
                       ? () {
-                          mostrarAlerta(
-                            () {
-                              if (!estadoProducto.manejaCombos.value) {
+                          if (!estadoProducto.manejaCombos.value) {
+                            estadoProducto.funtionHabilitar(
+                                index: widget.index);
+                          }
+                          listaFlotanteCombos(context: context).then(
+                            (value) {
+                              if (value != null) {
+                                estadoProducto.comboSeleccionado = value;
+                              } else {
+                                //cambiar el estado del switch
+                                //si no se selecciona un combo
                                 estadoProducto.funtionHabilitar(
                                     index: widget.index);
+                                estadoProducto.comboSeleccionado =
+                                    Combos.defecto();
+
+                                estadoProducto.nombreComboSeleccionado.value =
+                                    '';
                               }
-                              listaFotanteCombos(context: context).then(
-                                (value) {
-                                  if (value != null) {
-                                    estadoProducto.idComboSeleccionado.value =
-                                        value.codigo;
-                                    estadoProducto.nombreComboSeleccionado
-                                        .value = value.nombre;
-                                  } else {
-                                    //cambiar el estado del switch
-                                    //si no se selecciona un combo
-                                    estadoProducto.funtionHabilitar(
-                                        index: widget.index);
-                                    estadoProducto.idComboSeleccionado.value =
-                                        0;
-                                    estadoProducto
-                                        .nombreComboSeleccionado.value = '';
-                                  }
-                                  actualizar();
-                                  print(
-                                      'este es el codigo del combo seleccionado${estadoProducto.idComboSeleccionado.value}');
-                                },
-                              );
+                              actualizar();
                             },
                           );
                         }
@@ -475,8 +469,8 @@ class _TextFormFieldProductoState extends State<TextFormFieldProducto> {
                                           .toUpperCase();
 
                                   //Colocar el id del producto principal en el estado
-                                  estadoMulticodigos.idProducto =
-                                      estadoProducto.productoConsultado.id;
+                                  // estadoMulticodigos.idProducto =
+                                  //     estadoProducto.productoConsultado.id;
                                   if (!estadoProducto
                                       .manejaMulticodigos.value) {
                                     estadoProducto.funtionHabilitar(
@@ -486,7 +480,8 @@ class _TextFormFieldProductoState extends State<TextFormFieldProducto> {
                                   listaFlotanteMulticodigos(context: context)
                                       .then(
                                     (value) {
-                                      if (estadoMulticodigos.lista.isEmpty) {
+                                      if (estadoMulticodigos
+                                          .listaMulticodigos.isEmpty) {
                                         estadoProducto.funtionHabilitar(
                                             index: widget.index);
                                       }

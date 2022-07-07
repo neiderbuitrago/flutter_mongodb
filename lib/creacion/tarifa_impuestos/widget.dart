@@ -2,12 +2,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_mongodb/estado_getx/getx_tarifa_impuesto.dart';
+import 'package:flutter_mongodb/estado_getx/tarifa_impuesto_getx.dart';
 import 'package:get/get.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
 import '../../db/tarifa_impuestos_mongo.dart';
 import '../../funciones_generales/numeros.dart';
+import '../../funciones_generales/strings.dart';
 import '../../modelos/tarifa_impuestos.dart';
 import '../widget.dart';
 
@@ -25,11 +26,7 @@ class TextFormFieldTarifa extends StatelessWidget {
   Widget build(BuildContext context) {
     EstadoTarImpuestos estadoTarImpuestos = Get.find<EstadoTarImpuestos>();
 
-    estadoTarImpuestos.controlador[0].addListener(() {
-      estadoTarImpuestos.controlador[0].value =
-          estadoTarImpuestos.controlador[0].value.copyWith(
-              text: estadoTarImpuestos.controlador[0].value.text.toUpperCase());
-    });
+    campoEnMayusculas(controller: estadoTarImpuestos.controlador[0]);
 
     return TextField(
       focusNode: estadoTarImpuestos.focusNode[index],

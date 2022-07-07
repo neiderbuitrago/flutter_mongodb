@@ -30,8 +30,9 @@ class GruposDB {
 
   static Future getId(ObjectId id) async {
     try {
-      var datos = await coleccion.find(where.id(id)).toList();
-      return datos;
+      List datos = await coleccion.find(where.id(id)).toList();
+
+      return (datos.isEmpty) ? null : datos;
     } catch (e) {
       print(e);
       return Future.value();

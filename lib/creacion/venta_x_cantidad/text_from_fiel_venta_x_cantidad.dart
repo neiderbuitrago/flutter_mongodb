@@ -1,10 +1,10 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_mongodb/creacion/venta_x_cantidad/widget.dart';
 import 'package:get/get.dart';
-
-import '../../estado_getx/getx_productos.dart';
+import '../../estado_getx/productos_getx.dart';
 import '../../estado_getx/venta_x_cantidad_getx.dart';
 
 class TexfieldVentaXCantidad extends StatefulWidget {
@@ -81,36 +81,23 @@ class _TexfieldVentaXCantidadState extends State<TexfieldVentaXCantidad> {
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 15, vertical: 2),
           ),
+          inputFormatters: [
+            FilteringTextInputFormatter.allow(RegExp('[0-9-.]'))
+          ],
           onChanged: (widget.index == 2 ||
                   widget.index == 6 ||
                   widget.index == 10 ||
                   widget.index == 14)
               ? (value) {
-                  calcularGanancias(
-                    index: widget.index,
-                  );
+                  calcularGananciasVentaXcantidad();
                 }
               : (widget.index == 3 ||
                       widget.index == 7 ||
                       widget.index == 11 ||
                       widget.index == 15)
                   ? (value) {
-                      double costo = comprovarSihayNumero(
-                          estadoProducto.controladores[5].text);
-                      double desde = comprovarSihayNumero(estadoVentaXCantidad
-                          .controladoresVentaXCantidad[widget.index - 2].text);
-                      double hasta = comprovarSihayNumero(estadoVentaXCantidad
-                          .controladoresVentaXCantidad[widget.index - 1].text);
-
-                      if (desde != 0 && hasta != 0) {
-                        int precioVenta =
-                            ((costo * comprovarSihayNumero(value)) / 100 +
-                                    costo)
-                                .toInt();
-                        estadoVentaXCantidad
-                            .controladoresVentaXCantidad[widget.index - 1]
-                            .text = (precioVenta.round()).toString();
-                      }
+                      print(value);
+                      calcularPrecioVenta(value: value, index: widget.index);
                     }
                   : (widget.index == 0 ||
                           widget.index == 1 ||

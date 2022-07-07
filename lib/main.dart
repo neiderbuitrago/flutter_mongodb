@@ -6,11 +6,9 @@ import 'package:flutter_mongodb/db/combo.dart';
 import 'package:flutter_mongodb/db/empresa_mongo.dart';
 import 'package:flutter_mongodb/db/identificadores.dart';
 import 'package:flutter_mongodb/db/multicodigo.dart';
-import 'package:flutter_mongodb/estado_getx/getx_marcas.dart';
-import 'package:flutter_mongodb/estado_getx/getx_productos.dart';
-
+import 'package:flutter_mongodb/estado_getx/marcas_getx.dart';
+import 'package:flutter_mongodb/estado_getx/productos_getx.dart';
 import 'package:get/get.dart';
-
 import 'creacion/grupos/creacion_grupos.dart';
 import 'creacion/marcas/creacion_marca.dart';
 import 'creacion/productos/creacion_productos.dart';
@@ -20,9 +18,10 @@ import 'db/grupos_mongo.dart';
 import 'db/marcas_mongo.dart';
 import 'db/productos_mongo.dart';
 import 'db/tarifa_impuestos_mongo.dart';
+import 'db/venta_x_cantida_mongo.dart';
 import 'estado_getx/combos_getx.dart';
 import 'estado_getx/fracciones_getx.dart';
-import 'estado_getx/getx_grupos.dart';
+import 'estado_getx/grupos_getx .dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,6 +34,7 @@ void main() async {
   await ComboDB.conectar();
   await IdentificadorDB.conectar();
   await FraccionesDB.conectar();
+  await VentaXCantidadDB.conectar();
 
   runApp(const MyApp());
 }

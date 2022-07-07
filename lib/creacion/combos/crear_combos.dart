@@ -1,11 +1,13 @@
+// ignore_for_file: must_be_immutable, avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:flutter_mongodb/creacion/combos/texfield.dart';
 import 'package:flutter_mongodb/db/combo.dart';
 import 'package:get/get.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import '../../estado_getx/combos_getx.dart';
+
 import '../../modelos/combo.dart';
-import '../../modelos/combo_detalle.dart';
 import '../productos/cuadro_flotante_consulta_productos.dart';
 import '../widget.dart';
 import 'lista_detalle_combo.dart';
@@ -14,14 +16,8 @@ import 'lista_seleccionar.dart';
 class CrearCombo extends StatelessWidget {
   CrearCombo({super.key});
 
-  var estadoCombos = Get.find<EstadoCombos>();
+  EstadoCombos estadoCombos = Get.find<EstadoCombos>();
   bool nombreDetalle = true;
-  // List<Map<String, dynamic>> listaDetalleCombos = [];
-  List<CombosDetalle> listaDetalleCombos = [];
-
-  actualzar() {
-    listaDetalleCombos = estadoCombos.combosDetalleAux.reversed.toList();
-  }
 
   IconButton deleteProduct() {
     return IconButton(
@@ -31,7 +27,28 @@ class CrearCombo extends StatelessWidget {
         color: Colors.redAccent,
       ),
       tooltip: 'Eliminar Combo',
-      onPressed: () {},
+      onPressed: () {
+        if (!estadoCombos.nuevoEditar.value) {
+          estadoCombos.eliminarCombo();
+        } else {
+          Get.snackbar('Error', 'No hay datos para eliminar',
+              titleText: const Text(
+                'Error',
+                style: TextStyle(fontSize: 30, fontWeight: FontWeight.w800),
+              ),
+              messageText: const Text(
+                'No hay datos para eliminar.',
+                style: TextStyle(fontSize: 26, fontWeight: FontWeight.w600),
+              ),
+              snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: const Color.fromARGB(255, 249, 127, 127),
+              colorText: Colors.white,
+              borderRadius: 20,
+              margin: const EdgeInsets.all(30),
+              borderColor: Colors.redAccent,
+              borderWidth: 1);
+        }
+      },
     );
   }
 
@@ -45,11 +62,8 @@ class CrearCombo extends StatelessWidget {
           letrasparaBuscar: '',
         ).then((value) {
           if (value != null) {
-            estadoCombos.combosDetalleAux.add(CombosDetalle.fromMap(value));
-            estadoCombos.controlleresCombosDetalle.add(TextEditingController());
-            estadoCombos.detalleCombosNombresCombos.value = false;
-            estadoCombos.pintarDetalle();
-            actualzar();
+            estadoCombos.agregarProducto(value);
+            // estadoCombos.pintarDetalle();
           }
         });
       },
@@ -62,6 +76,7 @@ class CrearCombo extends StatelessWidget {
     );
   }
 
+  @override
   Widget build(BuildContext context) {
     return Obx(
       () => Column(
@@ -102,7 +117,7 @@ class CrearCombo extends StatelessWidget {
                           const SizedBox(
                             width: 10,
                           ),
-                          guardar(context, estadoCombos, actualzar),
+                          guardar(context),
                           deleteProduct(),
                           IconButton(
                             onPressed: () {},
@@ -117,17 +132,13 @@ class CrearCombo extends StatelessWidget {
             ),
           ),
           (estadoCombos.detalleCombosNombresCombos.value)
-              ? SizedBox(
+              ? const SizedBox(
                   height: 500,
                   child: ListaCombos(
                     esEditable: true,
-                    actualizar: actualzar,
-                    // cambioDetalleNombre: widget.cambioDetalleNombre,
                   ),
                 )
-              : ListaDetalladoCombos(
-                  listaDetalleCombos: listaDetalleCombos,
-                  actualizar: actualzar),
+              : const ListaDetalladoCombos(),
         ],
       ),
     );
@@ -136,9 +147,8 @@ class CrearCombo extends StatelessWidget {
 
 Padding guardar(
   BuildContext context,
-  EstadoCombos estadoCombos,
-  Function actualizar,
 ) {
+  EstadoCombos estadoCombos = Get.find<EstadoCombos>();
   return elevatedButtonGuardar1(
     focusNode: FocusNode(),
     context: context,
@@ -148,29 +158,31 @@ Padding guardar(
         Combos comboGuardar = Combos(
           id: estadoCombos.nuevoEditar.value
               ? ObjectId()
-              : estadoCombos.codigoCombo.value,
+              : estadoCombos.comboConsultado.id,
           nombre: estadoCombos.controlleresCombosDetalle[0].text,
-          datosDescontar: estadoCombos.combosDetalleAux.toList(),
+          datosDescontar:
+              Combos.toListCombos(estadoCombos.combosDetalleAux.toList()),
           sincronizado: '',
         );
-
         if (estadoCombos.nuevoEditar.value) {
-          ComboDB.insertar(comboGuardar).then((value) {});
+          ComboDB.insertar(comboGuardar).then((value) {
+            estadoCombos.limpiarDetalles();
+            estadoCombos.filtrarCombos("");
+          });
         } else {
-          ComboDB.actualizar(comboGuardar).then((value) {});
+          ComboDB.actualizar(comboGuardar).then((value) {
+            estadoCombos.limpiarDetalles();
+            estadoCombos.filtrarCombos("");
+          });
         }
-
-        estadoCombos.combosDetalleAux.clear();
 
         for (var i = 2;
             i < estadoCombos.controlleresCombosDetalle.length;
             i++) {
           estadoCombos.controlleresCombosDetalle.removeAt(i);
         }
-
         estadoCombos.controlleresCombosDetalle = [TextEditingController()];
 
-        actualizar();
         estadoCombos.tituloCombos.value = 'Crear Combo';
         estadoCombos.nuevoEditar.value = true;
       }

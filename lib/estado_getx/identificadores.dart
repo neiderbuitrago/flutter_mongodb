@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../funciones_generales/numeros.dart';
 import '../modelos/identificador.dart';
 
 class EstadoIdentificador extends GetxController {
-  late Map<int, IdentificadorDetalle> datosIdentificador =
-      <int, IdentificadorDetalle>{}.obs;
+  List<IdentificadorDetalle> mapIdentificador = <IdentificadorDetalle>[].obs;
 
   late List controllerIdentificador = [
     TextEditingController(),
@@ -19,18 +19,23 @@ class EstadoIdentificador extends GetxController {
     FocusNode(),
   ].obs;
 //codigo del detalle
-  bool nuevoEditar = true;
+  var nuevoEditar = true.obs;
 
-  late IdentificadorDetalle identificador =
+  var nombreProducto = ''.obs;
+
+  late IdentificadorDetalle identificadorConsultado =
       <IdentificadorDetalle>{}.obs as IdentificadorDetalle;
+//sumar las cantidades de los identificadores
+
   double sumaTotales() {
-    return datosIdentificador.values
-        .fold(0, (sum, item) => sum + item.cantidad);
+    return mapIdentificador.fold(0, (t, e) => t + e.cantidad);
   }
 
   editarIdentificador(IdentificadorDetalle identificador) {
+    identificadorConsultado = identificador;
+    nuevoEditar.value = false;
     controllerIdentificador[0].text = identificador.nombre;
     controllerIdentificador[1].text = identificador.identificador.toString();
-    controllerIdentificador[2].text = identificador.cantidad.toString();
+    controllerIdentificador[2].text = enBlancoSiEsCero(identificador.cantidad);
   }
 }

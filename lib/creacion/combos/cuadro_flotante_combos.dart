@@ -6,9 +6,10 @@ import 'package:get/get.dart';
 
 import '../../estado_getx/combos_getx.dart';
 import '../../funciones_generales/response.dart';
+import '../../funciones_generales/strings.dart';
 import 'crear_combos.dart';
 
-Future<dynamic> listaFotanteCombos({
+Future<dynamic> listaFlotanteCombos({
   required BuildContext context,
 }) {
   return showDialog(
@@ -41,32 +42,27 @@ class ListaSeleccion extends StatefulWidget {
 class _ListaSeleccionState extends State<ListaSeleccion> {
   final EstadoCombos estadoCombos = Get.find<EstadoCombos>();
 
-  List<FocusNode> focusNodeVXC = [];
-
-  List<List<Widget>> listaDewidgetParaCard = [];
-  bool datoValido = false;
-
   //bool detalleCombosNombresCombos = true;
 
   @override
   void initState() {
     super.initState();
-    focusNodeVXC = [for (var i = 0; i < 17; i++) FocusNode()];
+    estadoCombos.filtrarCombos("");
+    campoEnMayusculas(controller: estadoCombos.controlleresCombosDetalle[0]);
   }
-
-  // cambioDetalleNombre(bool valor) {
-  //   setState(() {
-  //     detalleCombosNombresCombos = valor;
-  //   });
-  // }
 
   @override
   Widget build(BuildContext context) {
     AnchoDePantalla medidas = anchoPantalla(context);
+    print(medidas.anchoLista);
+    print(medidas.alto * 0.8 - MediaQuery.of(context).viewInsets.bottom);
 
     return SizedBox(
       width: medidas.anchoLista,
-      height: medidas.alto * 0.8 - MediaQuery.of(context).viewInsets.bottom,
+      height:
+          medidas.alto * 0.8 - 112 - MediaQuery.of(context).viewInsets.bottom,
+      // width: 450,
+      // height: 400,
       child: Obx(
         () => Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -75,42 +71,33 @@ class _ListaSeleccionState extends State<ListaSeleccion> {
             encabezado(
               context: context,
               anchoLista: medidas.anchoLista,
-
-              //   cambioDetalleNombre: cambioDetalleNombre,
             ),
-            Obx(
-              () => estadoCombos.seleccionarCrear.value
-                  ? Expanded(
-                      child: SizedBox(
-                        width: medidas.anchoLista,
-                        height: medidas.alto * 0.8 -
-                            112 -
-                            MediaQuery.of(context).viewInsets.bottom,
-                        child: ListView(
-                          // scrollDirection: Axis.horizontal,
-                          children: [
-                            const SizedBox(height: 12),
-                            TexfildFiltro(
-                              cambiarLaVista: () {},
-                            ),
-                          ],
-                        ),
+            Expanded(
+                child: SizedBox(
+              width: medidas.anchoLista,
+              height: medidas.alto * 0.8 -
+                  112 -
+                  MediaQuery.of(context).viewInsets.bottom,
+              // width: 400,
+              // height: 400,
+              child: Obx(
+                () => estadoCombos.seleccionarCrear.value
+                    ? ListView(
+                        //  scrollDirection: Axis.horizontal,
+                        children: [
+                          const SizedBox(height: 12),
+                          TexfildFiltro(
+                            cambiarLaVista: () {},
+                          ),
+                        ],
+                      )
+                    : ListView(
+                        children: [
+                          CrearCombo(),
+                        ],
                       ),
-                    )
-                  : Expanded(
-                      child: SizedBox(
-                        width: medidas.anchoLista,
-                        height: medidas.alto * 0.8 -
-                            112 -
-                            MediaQuery.of(context).viewInsets.bottom,
-                        child: ListView(
-                          children: [
-                            CrearCombo(),
-                          ],
-                        ),
-                      ),
-                    ),
-            ),
+              ),
+            )),
             if (estadoCombos.seleccionarCrear.value)
               buttonIconTexto(
                 texto: 'Crear Combo',

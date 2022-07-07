@@ -3,10 +3,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mongodb/db/grupos_mongo.dart';
 import 'package:flutter_mongodb/db/marcas_mongo.dart';
-import 'package:flutter_mongodb/estado_getx/getx_grupos.dart';
+import 'package:flutter_mongodb/estado_getx/grupos_getx%20.dart';
 import 'package:get/get.dart';
 import 'package:mongo_dart/mongo_dart.dart';
-import '../../estado_getx/getx_marcas.dart';
+import '../../estado_getx/marcas_getx.dart';
+import '../../funciones_generales/strings.dart';
 import '../../modelos/marcas.dart';
 import '../widget.dart';
 
@@ -20,17 +21,8 @@ textFormFieldGeneral({
   EstadoGrupos estadoGrupos = Get.put(EstadoGrupos());
   EstadoMarcas estadoMarcas = Get.put(EstadoMarcas());
 
-  estadoGrupos.controlador[0].addListener(() {
-    final String text = estadoGrupos.controlador[0].text.toUpperCase();
-    estadoGrupos.controlador[0].value =
-        estadoGrupos.controlador[0].value.copyWith(text: text);
-  });
-
-  estadoMarcas.controlador[0].addListener(() {
-    final String text = estadoMarcas.controlador[0].text.toUpperCase();
-    estadoMarcas.controlador[0].value =
-        estadoMarcas.controlador[0].value.copyWith(text: text);
-  });
+  campoEnMayusculas(controller: estadoGrupos.controlador[0]);
+  campoEnMayusculas(controller: estadoMarcas.controlador[0]);
 
   return TextField(
     focusNode: focusNode[0],

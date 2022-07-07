@@ -1,33 +1,75 @@
-import 'package:flutter_mongodb/estado_getx/multicodigo_getx.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mongo_dart/mongo_dart.dart';
 
-import '../../db/multicodigo.dart';
-import '../../modelos/multicodigo.dart';
+import '../../estado_getx/multicodigo_getx.dart';
+import '../widget.dart';
 
-guardarMulticodigo() {
-  EstadoMulticodigos estado = Get.find<EstadoMulticodigos>();
-  Multicodigo multicodigoGuardar = Multicodigo(
-    id: (estado.nuevoEditar) ? ObjectId() : estado.multicodigo.id,
-    codigo: estado.codigo.value,
-    idProducto: estado.idProducto,
-    detalle: estado.controllerMulticodigo[2].text,
-    sincronizado: '0',
-  );
+class TextfildMulticodigo extends StatefulWidget {
+  const TextfildMulticodigo({
+    Key? key,
+    this.guardarLosCambios,
+    required this.labelText,
+    required this.index,
+  }) : super(key: key);
 
-  if (estado.nuevoEditar) {
-    MulticodigoDB.insertar(multicodigoGuardar);
-  } else {
-    MulticodigoDB.actualizar(multicodigoGuardar);
-  }
+  final bool? guardarLosCambios;
+  final String labelText;
+  final int index;
+
+  @override
+  _TextfildMulticodigoState createState() => _TextfildMulticodigoState();
 }
 
-editarMulticodigo(codigo) {
-  EstadoMulticodigos estado = Get.find<EstadoMulticodigos>();
-  estado.nuevoEditar = false;
-  estado.codigo.value = codigo;
-  estado.multicodigo = codigo;
-  estado.controllerMulticodigo[1].text = codigo.codigo;
-  estado.controllerMulticodigo[2].text = codigo.detalle;
-  estado.focusnode[1].requestFocus();
+class _TextfildMulticodigoState extends State<TextfildMulticodigo> {
+  @override
+  Widget build(BuildContext context) {
+    EstadoMulticodigos estadoMulticodigo = Get.find<EstadoMulticodigos>();
+
+    return Padding(
+      padding: const EdgeInsets.all(5.0),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(30),
+          // ignore: dead_code
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              spreadRadius: 1,
+            )
+          ],
+        ),
+        child: TextField(
+          readOnly: (widget.index == 0) ? true : false,
+          focusNode: estadoMulticodigo.focusnode[widget.index],
+          autofocus: (widget.index == 1) ? true : false,
+          controller: estadoMulticodigo.controllerMulticodigo[widget.index],
+          decoration: InputDecoration(
+            suffixIconColor: Colors.black,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
+            labelText: widget.labelText,
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 15, vertical: 2),
+          ),
+          onChanged: (widget.index == 2)
+              ? (value) {
+                  estadoMulticodigo.controllerMulticodigo[0].text =
+                      '${estadoMulticodigo.nombreProducto.value} $value';
+                }
+              : null,
+          onSubmitted: (value) {
+            //cambiar de foco
+            if (widget.index == 3) {
+              estadoMulticodigo.focusnode[1].requestFocus();
+            } else {
+              estadoMulticodigo.focusnode[widget.index + 1].requestFocus();
+            }
+          },
+        ),
+      ),
+    );
+  }
 }

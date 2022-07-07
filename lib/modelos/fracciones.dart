@@ -1,7 +1,7 @@
 import 'package:mongo_dart/mongo_dart.dart';
 
 class Fracciones {
-  ObjectId idPadre;
+  ObjectId id;
   double cantidadXEmpaque;
   String codigo1;
   String nombre1;
@@ -26,7 +26,7 @@ class Fracciones {
   double bodega4;
   double bodega5;
   Fracciones({
-    required this.idPadre,
+    required this.id,
     this.cantidadXEmpaque = 0,
     this.codigo1 = '',
     this.nombre1 = '',
@@ -54,7 +54,7 @@ class Fracciones {
   //
   Map<String, dynamic> toMap() {
     return {
-      'idPadre': idPadre,
+      '_id': id,
       'cantidadXEmpaque': cantidadXEmpaque,
       'codigo1': codigo1,
       'nombre1': nombre1,
@@ -81,9 +81,9 @@ class Fracciones {
     };
   }
 
-  factory Fracciones.fromMap(Map<String, dynamic> map) {
+  factory Fracciones.fromMap(map) {
     return Fracciones(
-      idPadre: map['idPadre'],
+      id: map['_id'],
       cantidadXEmpaque: map['cantidadXEmpaque'],
       codigo1: map['codigo1'],
       nombre1: map['nombre1'],
@@ -108,5 +108,11 @@ class Fracciones {
       bodega4: map['bodega4'],
       bodega5: map['bodega5'],
     );
+  }
+  isEmpty() {
+    return (cantidadXEmpaque != 0.0 &&
+        cantidadDescontar1 != 0.0 &&
+        nombre1.isEmpty &&
+        precio1 != 0.0);
   }
 }

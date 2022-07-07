@@ -1,11 +1,8 @@
 // ignore_for_file: avoid_print
 
 import 'package:flutter/material.dart';
-import 'package:flutter_mongodb/db/productos_mongo.dart';
 import 'package:get/get.dart';
-
-import '../../estado_getx/getx_productos.dart';
-import '../../modelos/productos.dart';
+import '../../estado_getx/productos_getx.dart';
 import '../widget.dart';
 
 //import 'package:hive6/modelo_datos/productos_identificador_detalle.dart';

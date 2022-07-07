@@ -1,7 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
-import 'package:flutter_mongodb/estado_getx/getx_tarifa_impuesto.dart';
+import 'package:flutter_mongodb/estado_getx/tarifa_impuesto_getx.dart';
 import 'package:get/get.dart';
 
 import 'widget.dart';

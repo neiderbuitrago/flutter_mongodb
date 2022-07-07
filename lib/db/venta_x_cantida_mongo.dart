@@ -32,7 +32,11 @@ class VentaXCantidadDB {
   static Future getId(ObjectId id) async {
     try {
       var datos = await coleccion.find(where.id(id)).toList();
-      return datos;
+      if (datos.isEmpty) {
+        return null;
+      } else {
+        return datos;
+      }
     } catch (e) {
       print(e);
       return Future.value();
@@ -40,50 +44,34 @@ class VentaXCantidadDB {
   }
 
   static Future<void> insertar(VentaXCantidad value) async {
-    if (await existeNombre(value)) {
-      try {
-        await coleccion.insertAll([value.toMap()]);
-        print("tarifa impuestos insertada");
-      } catch (e) {
-        print(e);
-      }
+    try {
+      await coleccion.insertAll([value.toMap()]);
+      print("tarifa impuestos insertada");
+    } catch (e) {
+      print(e);
     }
   }
 
   static Future actualizar(VentaXCantidad value) async {
-    if (await existeNombre(value)) {
-      try {
-        var a = await coleccion.update(
-          where.eq("_id", value.idPadre),
-          value.toMap(),
-        );
-        return a["updatedExisting"];
-      } catch (e) {
-        print(e);
-        return false;
-      }
+    try {
+      var a = await coleccion.update(
+        where.eq("_id", value.id),
+        value.toMap(),
+      );
+      return a["updatedExisting"];
+    } catch (e) {
+      print(e);
+      return false;
     }
   }
 
   static Future<void> eliminar(VentaXCantidad value) async {
     try {
       await coleccion.remove(
-        where.eq('_id', value.idPadre),
+        where.eq('_id', value.id),
       );
     } catch (e) {
       print(e);
-    }
-  }
-
-  static Future<bool> existeNombre(VentaXCantidad value) async {
-    try {
-      final existe =
-          await coleccion.find(where.eq('_id', value.idPadre)).toList();
-
-      return existe.isEmpty;
-    } catch (e) {
-      print(e);
-      return false;
     }
   }
 }

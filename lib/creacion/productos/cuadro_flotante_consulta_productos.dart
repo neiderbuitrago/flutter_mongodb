@@ -9,7 +9,7 @@ import 'package:get/get.dart';
 import '../../db/grupos_mongo.dart';
 import '../../db/marcas_mongo.dart';
 import '../../db/tarifa_impuestos_mongo.dart';
-import '../../estado_getx/getx_productos.dart';
+import '../../estado_getx/productos_getx.dart';
 import '../../funciones_generales/response.dart';
 import '../lista_seleccion.dart';
 
@@ -127,10 +127,13 @@ class _ListaSeleccionState extends State<ListaSeleccion> {
     AnchoDePantalla medidas = anchoPantalla(context);
 
     filtrarValores();
+    print("""${medidas.anchoLista}
+    ${medidas.alto * 0.6}""");
 
     return SizedBox(
-      width: medidas.anchoLista,
-      height: medidas.alto * 0.6,
+      width: 400,
+      //medidas.anchoLista,
+      height: medidas.alto * 0.7,
       child: Column(
         children: [
           Row(

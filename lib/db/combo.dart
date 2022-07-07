@@ -1,8 +1,10 @@
 // ignore_for_file: avoid_print, null_argument_to_non_null_type, prefer_typing_uninitialized_variables
 
-import 'package:flutter_mongodb/modelos/combo.dart';
 import 'package:flutter_mongodb/utilidades.dart';
+
 import 'package:mongo_dart/mongo_dart.dart';
+
+import '../modelos/combo.dart';
 
 class ComboDB {
   static var db, coleccion;
@@ -15,13 +17,12 @@ class ComboDB {
 
   static Future getParametro(String letras) async {
     try {
-      var datos = await coleccion
+      List datos = await coleccion
           .find(where
               .match("nombre", letras, caseInsensitive: true)
               .sortBy("nombre", descending: false))
           .toList();
-
-      return datos;
+      return datos.isEmpty ? null : datos;
     } catch (e) {
       print(e);
       return Future.value();
@@ -31,18 +32,17 @@ class ComboDB {
   static Future getId(ObjectId id) async {
     try {
       List datos = await coleccion.find(where.id(id)).toList();
-      if (datos.isEmpty) return null;
-      return datos;
+      //  print(datos);
+      return (datos.isEmpty) ? null : (Combos.fromMapList(datos))[0];
     } catch (e) {
       print(e);
+
       return Future.value();
     }
   }
 
   static Future<void> insertar(Combos valor) async {
-    //comprovar si existe
-
-    if (await existeNombre(valor.nombre)) {
+    if (await existeNombre(valor)) {
       try {
         await coleccion.insertAll([valor.toMap()]);
         print("Combo insertado");
@@ -53,7 +53,7 @@ class ComboDB {
   }
 
   static Future<void> actualizar(Combos valor) async {
-    if (await existeNombre(valor.nombre)) {
+    if (await existeNombre(valor)) {
       try {
         await coleccion.update(
           where.eq("_id", valor.id),
@@ -76,14 +76,19 @@ class ComboDB {
   }
 
   //comprobar si el nombre existe
-  static Future<bool> existeNombre(String nombre) async {
+  static Future<bool> existeNombre(Combos value) async {
+    //  EstadoCombos estadocombo = Get.find<EstadoCombos>();
     try {
       final existe = await coleccion
           .find(where
-              .eq("nombre", nombre)
-              .or(where.eq("nombre", nombre.toLowerCase())))
+              .eq("nombre", value.nombre)
+              .or(where.eq("nombre", value.nombre.toLowerCase())))
           .toList();
-      return (existe.isEmpty) ? true : false;
+      return (existe.isEmpty)
+          ? true
+          : (existe[0]['_id'] == value.id)
+              ? true
+              : false;
     } catch (e) {
       print(e);
       return false;

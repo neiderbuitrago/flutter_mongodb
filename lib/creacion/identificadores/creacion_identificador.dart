@@ -1,13 +1,13 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, library_private_types_in_public_api
 
+import 'package:flutter_mongodb/creacion/identificadores/textfild_identificador.dart';
+import 'package:flutter_mongodb/creacion/identificadores/widget.dart';
 import 'package:flutter_mongodb/db/identificadores.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import '../../estado_getx/getx_productos.dart';
 import '../../estado_getx/identificadores.dart';
 import '../../funciones_generales/response.dart';
-
-import '../multicodigos/creacion_multicodigos.dart';
+import '../../funciones_generales/strings.dart';
 import '../venta_x_cantidad/widget.dart';
 
 import 'lista.dart';
@@ -41,6 +41,12 @@ class ListaIdentificadores extends StatefulWidget {
 }
 
 class _ListaIdentificadoresState extends State<ListaIdentificadores> {
+  @override
+  void initState() {
+    consultarDatos(actualizar);
+    super.initState();
+  }
+
   actualizar() {
     setState(() {});
   }
@@ -48,40 +54,35 @@ class _ListaIdentificadoresState extends State<ListaIdentificadores> {
   @override
   Widget build(BuildContext context) {
     EstadoIdentificador estadoIdentificador = Get.find<EstadoIdentificador>();
-    EstadoProducto estadoProducto = Get.find<EstadoProducto>();
-
-    IdentificadorDB.getParametro(estadoIdentificador.identificador.id)
-        .then((value) {
-      if (value != null) {
-        estadoIdentificador.datosIdentificador = value;
-      }
-    }).catchError((error) {
-      print(error);
-    });
 
     AnchoDePantalla medidas = anchoPantalla(context);
 
+    campoEnMayusculas(
+        controller: estadoIdentificador.controllerIdentificador[0]);
+    campoEnMayusculas(
+        controller: estadoIdentificador.controllerIdentificador[1]);
+
     var floatingActionButton = FloatingActionButton.extended(
       onPressed: () {
-        estadoIdentificador.datosIdentificador
-            .remove(estadoIdentificador.identificador.id);
-
         estadoIdentificador.controllerIdentificador[1].clear();
         estadoIdentificador.controllerIdentificador[2].clear();
-
-        actualizar();
+        estadoIdentificador.nuevoEditar.value = true;
+        IdentificadorDB.eliminar(estadoIdentificador.identificadorConsultado);
+        consultarDatos(actualizar);
       },
       icon: const Icon(
         Icons.delete,
         color: Colors.white,
         size: 25,
       ),
-      label: const Text('Eliminar',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          )),
+      label: const Text(
+        'Eliminar',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
     );
 
     return SizedBox(
@@ -98,18 +99,23 @@ class _ListaIdentificadoresState extends State<ListaIdentificadores> {
                   anchoLista: medidas.anchoLista,
                   titulo: 'Identificadores',
                 ),
-                const TextfildIdentificador(labelText: 'Nombre', index: 0),
+                textfildIdentificador(
+                    labelText: 'Nombre', index: 0, actualizar: actualizar),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SizedBox(
                         width: medidas.anchoLista * 0.49,
-                        child: const TextfildIdentificador(
-                            labelText: 'Identificador', index: 1)),
+                        child: textfildIdentificador(
+                            labelText: 'Identificador',
+                            index: 1,
+                            actualizar: actualizar)),
                     SizedBox(
                       width: medidas.anchoLista * 0.49,
-                      child: const TextfildIdentificador(
-                          labelText: 'Cantidad', index: 2),
+                      child: textfildIdentificador(
+                          labelText: 'Cantidad',
+                          index: 2,
+                          actualizar: actualizar),
                     ),
                   ],
                 ),
@@ -118,10 +124,7 @@ class _ListaIdentificadoresState extends State<ListaIdentificadores> {
                   children: [
                     SizedBox(
                         width: medidas.anchoLista * 0.49,
-                        child: guardar(
-                          context,
-                          actualizar,
-                        )),
+                        child: guardar(context, actualizar)),
                     SizedBox(
                       width: medidas.anchoLista * 0.49,
                       child: floatingActionButton,
@@ -131,19 +134,20 @@ class _ListaIdentificadoresState extends State<ListaIdentificadores> {
                 Padding(
                   padding: const EdgeInsets.all(4.0),
                   child: Text(
-                    'Identificadores: ${estadoIdentificador.datosIdentificador.length}           Suma Total: ${estadoIdentificador.sumaTotales()}',
+                    'Identificadores: ${estadoIdentificador.mapIdentificador.length}           Suma Total: ${estadoIdentificador.sumaTotales()}',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
-                FloatingActionButton.small(onPressed: () {})
+                // FloatingActionButton.small(onPressed: () {
+                //   consultarDatos(actualizar);
+                // })
               ],
             ),
           ),
-          ListaIdentificador(
-              estadoIdentificador: estadoIdentificador, medidas: medidas),
+          listaIdentificador(medidas: medidas, context: context),
         ],
       ),
     );

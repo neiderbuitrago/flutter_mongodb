@@ -1,14 +1,12 @@
 // ignore_for_file: avoid_print
 
 import 'package:flutter/material.dart';
-import 'package:flutter_mongodb/creacion/crear_fracciones/widget_fracciones.dart';
-import 'package:flutter_mongodb/db/fracciones.dart';
-import 'package:flutter_mongodb/estado_getx/getx_productos.dart';
+import 'package:flutter_mongodb/creacion/fracciones/widget_fracciones.dart';
+import 'package:flutter_mongodb/creacion/productos/llenar_datos.dart';
+import 'package:flutter_mongodb/estado_getx/productos_getx.dart';
 import 'package:get/get.dart';
-
 import '../../estado_getx/fracciones_getx.dart';
 import '../../funciones_generales/response.dart';
-import '../../modelos/fracciones.dart';
 
 Future<dynamic> listaFlotanteFracciones({required BuildContext context}) {
   return showDialog(
@@ -48,14 +46,8 @@ class _ListaSeleccionState extends State<ListaSeleccion> {
   @override
   void initState() {
     focofracciones = [for (var i = 0; i < 23; i++) FocusNode()];
-    if (!estadoProducto.nuevoEditar.value) {
-      FraccionesDB.getId(estadoProducto.productoConsultado.id).then((value) {
-        if (value != null) {
-          estadoVentaFraccionada.fraccionesConsultadas =
-              Fracciones.fromMap(value);
-        }
-      });
-    }
+    llenarFracciones(estadoProducto.productoConsultado.id);
+
     super.initState();
   }
 
@@ -116,20 +108,20 @@ class _ListaSeleccionState extends State<ListaSeleccion> {
           medidas: medidas,
         ),
         Cardgeneral(
-          children: listaDewidgetParaCard[0],
           colorbordes: const Color.fromARGB(255, 4, 157, 217),
+          children: listaDewidgetParaCard[0],
         ),
         Cardgeneral(
-          children: listaDewidgetParaCard[1],
           colorbordes: const Color.fromARGB(255, 11, 217, 4),
+          children: listaDewidgetParaCard[1],
         ),
         Cardgeneral(
-          children: listaDewidgetParaCard[2],
           colorbordes: const Color.fromARGB(255, 210, 217, 4),
+          children: listaDewidgetParaCard[2],
         ),
         Cardgeneral(
-          children: listaDewidgetParaCard[3],
           colorbordes: const Color.fromARGB(255, 242, 19, 19),
+          children: listaDewidgetParaCard[3],
         ),
       ],
     );
@@ -138,10 +130,8 @@ class _ListaSeleccionState extends State<ListaSeleccion> {
   @override
   Widget build(BuildContext context) {
     llenaListaWidget();
-    estadoVentaFraccionada.calcularGanancias(index: 3);
-    estadoVentaFraccionada.calcularGanancias(index: 7);
-    estadoVentaFraccionada.calcularGanancias(index: 11);
-    estadoVentaFraccionada.calcularGanancias(index: 15);
+    estadoVentaFraccionada.calcularGanancias();
+
     AnchoDePantalla medidas = anchoPantalla(context);
 
     return SizedBox(

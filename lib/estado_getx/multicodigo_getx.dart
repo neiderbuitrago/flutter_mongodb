@@ -1,19 +1,22 @@
 // ignore_for_file: avoid_print
 
 import 'package:flutter/material.dart';
-import 'package:get/state_manager.dart';
+import 'package:flutter_mongodb/estado_getx/productos_getx.dart';
+import 'package:get/get.dart';
+
 import 'package:mongo_dart/mongo_dart.dart';
 
+import '../db/multicodigo.dart';
 import '../modelos/multicodigo.dart';
 
 class EstadoMulticodigos extends GetxController {
   var nuevoEditar = true;
   var nombreProducto = ''.obs;
-  ObjectId idProducto = <ObjectId>{}.obs as ObjectId;
-  var codigo = "".obs;
-  Multicodigo multicodigo = <Multicodigo>{}.obs as Multicodigo;
+  // ObjectId idProducto = {}.obs as ObjectId;
 
-  List<Multicodigo> lista = [];
+  late Multicodigo multicodigo = {}.obs as Multicodigo;
+
+  List<Multicodigo> listaMulticodigos = <Multicodigo>[].obs;
 
   late List controllerMulticodigo = [
     TextEditingController(text: nombreProducto.value),
@@ -26,11 +29,67 @@ class EstadoMulticodigos extends GetxController {
     FocusNode(),
     FocusNode(),
   ].obs;
-  limpiarCampos() {
-    controllerMulticodigo[0].text = nombreProducto.value;
-    controllerMulticodigo[1].clean;
-    controllerMulticodigo[2].clean;
-    codigo.value = '0';
+
+  consultarMulticodigos(String codigo) {
+    EstadoProducto estadoProducto = Get.find<EstadoProducto>();
+    MulticodigoDB.getParametro(
+      estadoProducto.productoConsultado.id,
+    ).then((value) {
+      if (value != null) {
+        listaMulticodigos = Multicodigo.fromMapList(value);
+        update();
+      }
+    });
+  }
+
+  guardarMulticodigo() {
+    EstadoProducto estadoProducto = Get.find<EstadoProducto>();
+    EstadoMulticodigos estado = Get.find<EstadoMulticodigos>();
+    Multicodigo multicodigoGuardar = Multicodigo(
+      id: (estado.nuevoEditar) ? ObjectId() : estado.multicodigo.id,
+      codigo: (estado.controllerMulticodigo[1].text).toString().toUpperCase(),
+      idProducto: estadoProducto.productoConsultado.id,
+      detalle: estado.controllerMulticodigo[2].text,
+      sincronizado: '',
+    );
+
+    if (estado.nuevoEditar) {
+      MulticodigoDB.insertar(multicodigoGuardar).then(
+        (value) {
+          limpiarCampos();
+          consultarMulticodigos('');
+        },
+      );
+    } else {
+      MulticodigoDB.actualizar(multicodigoGuardar).then(
+        (value) {
+          limpiarCampos();
+          consultarMulticodigos('');
+        },
+      );
+    }
+  }
+
+  editarMulticodigo(Multicodigo codigo) {
+    nuevoEditar = false;
+    multicodigo = codigo;
+    controllerMulticodigo[1].text = codigo.codigo;
+    controllerMulticodigo[2].text = codigo.detalle;
     focusnode[1].requestFocus();
+  }
+
+  limpiarCampos() {
+    nuevoEditar = true;
+    controllerMulticodigo[0].text = nombreProducto.value;
+    controllerMulticodigo[1].text = '';
+    controllerMulticodigo[2].text = '';
+    focusnode[1].requestFocus();
+    update();
+  }
+
+  eliminar(Multicodigo multicodigo) {
+    MulticodigoDB.eliminar(multicodigo);
+    limpiarCampos();
+    consultarMulticodigos('');
   }
 }

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 
-import '../../estado_getx/getx_grupos.dart';
+import '../../estado_getx/grupos_getx .dart';
 import '../marcas/lista.dart';
 import '../marcas/widget.dart';
 

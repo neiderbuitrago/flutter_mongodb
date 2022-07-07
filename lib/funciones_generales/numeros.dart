@@ -18,5 +18,7 @@ String quitarDecimales(double numero) {
 }
 
 String enBlancoSiEsCero(double valor) {
-  return (valor == 0.0) ? "" : valor.toString();
+  double decimal = valor - valor.truncate();
+  var resultado = (decimal == 0) ? valor.truncate() : valor;
+  return (valor == 0) ? "" : resultado.toString();
 }

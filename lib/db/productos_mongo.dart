@@ -1,9 +1,8 @@
 // ignore_for_file: avoid_print, prefer_typing_uninitialized_variables, null_argument_to_non_null_type
 
-import 'package:flutter_mongodb/estado_getx/getx_productos.dart';
 import 'package:flutter_mongodb/modelos/productos.dart';
 import 'package:flutter_mongodb/utilidades.dart';
-import 'package:get/get.dart';
+
 import 'package:mongo_dart/mongo_dart.dart';
 
 class ProductosDB {
@@ -77,7 +76,7 @@ class ProductosDB {
   static Future<void> insertar(Productos datos) async {
     //comprovar si existe
 
-    if (await existeNombre(datos.nombre)) {
+    if (await existeNombre(datos)) {
       try {
         await coleccionProductos.insertAll([datos.toMap()]);
         print("Producto insertada");
@@ -88,7 +87,7 @@ class ProductosDB {
   }
 
   static Future<void> actualizar(Productos datos) async {
-    if (await existeNombre(datos.nombre)) {
+    if (!await existeNombre(datos)) {
       try {
         await coleccionProductos.update(
           where.eq("_id", datos.id),
@@ -111,14 +110,27 @@ class ProductosDB {
   }
 
   //comprobar si el nombre existe
-  static Future<bool> existeNombre(String nombre) async {
+  static Future<bool> existeNombre(Productos nombre) async {
     try {
-      final existe = await coleccionProductos
-          .find(where
-              .eq("nombre", nombre)
-              .or(where.eq("nombre", nombre.toLowerCase())))
+      List existe = await coleccionProductos
+          .find(where.eq("nombre", nombre.nombre).or(where
+              .eq("nombre", nombre.nombre.toUpperCase())
+              .or(where.eq("codigo", nombre.codigo))
+              .or(where.eq("codigo", nombre.codigo.toUpperCase()))))
           .toList();
-      return (existe.isEmpty) ? true : false;
+      bool resultado = (existe.isEmpty)
+          ? false
+          : (existe[0]["_id"] == nombre.id)
+              ? false
+              : true;
+      resultado = existe
+          .map((e) {
+            return e["_id"] != nombre.id;
+          })
+          .toList()
+          .contains(true);
+      print("producto existe $resultado");
+      return resultado;
     } catch (e) {
       print(e);
       return false;

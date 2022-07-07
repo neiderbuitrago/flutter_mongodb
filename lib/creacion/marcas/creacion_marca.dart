@@ -1,7 +1,7 @@
 //ignore_for_file: avoid_print, library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
-import 'package:flutter_mongodb/estado_getx/getx_marcas.dart';
+import 'package:flutter_mongodb/estado_getx/marcas_getx.dart';
 import 'package:get/get.dart';
 
 import 'lista.dart';

@@ -33,4 +33,8 @@ class Multicodigo {
       sincronizado: map['sincronizado'],
     );
   }
+
+  static List<Multicodigo> fromMapList(List<Map<String, dynamic>> mapList) {
+    return mapList.map((map) => Multicodigo.fromMap(map)).toList();
+  }
 }

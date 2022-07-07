@@ -3,9 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mongodb/creacion/productos/text_form_field.dart';
 import 'package:flutter_mongodb/db/marcas_mongo.dart';
+import 'package:flutter_mongodb/estado_getx/combos_getx.dart';
+import 'package:flutter_mongodb/estado_getx/multicodigo_getx.dart';
 
-import 'package:flutter_mongodb/estado_getx/getx_productos.dart';
+import 'package:flutter_mongodb/estado_getx/productos_getx.dart';
 import 'package:flutter_mongodb/estado_getx/venta_x_cantidad_getx.dart';
+import 'package:flutter_mongodb/modelos/combo.dart';
 import 'package:get/get.dart';
 
 import '../../estado_getx/identificadores.dart';
@@ -24,19 +27,20 @@ class _CreacionProductosState extends State<CreacionProductos> {
   EstadoProducto estadoProducto = Get.find<EstadoProducto>();
   EstadoVentaXCantidad estadoVentaXCantidad = Get.put(EstadoVentaXCantidad());
   EstadoIdentificador estadoIdentificador = Get.put(EstadoIdentificador());
+  EstadoMulticodigos estadoMulticodigos = Get.put(EstadoMulticodigos());
+  EstadoCombos estadoCombos = Get.put(EstadoCombos());
+
   @override
   Widget build(BuildContext context) {
     estadoProducto.marcaSeleccionada = MarcasGrupos.defecto();
     estadoProducto.grupoSeleccionado = MarcasGrupos.defecto();
+
+    estadoProducto.comboSeleccionado = Combos.defecto();
     if (estadoProducto.controladores.isEmpty) {
       estadoProducto.controladores = [
         for (var i = 0; i < (estadoProducto.campos.length); i++)
           TextEditingController()
       ];
-
-      // estadoVentaXCantidad.controladoresVentaXCantidad = [
-      //   for (var i = 0; i < 16; i++) TextEditingController()
-      // ];
 
       estadoProducto.focusNode = [
         for (int i = 0; i < (estadoProducto.campos.length + 1); i++) FocusNode()

@@ -49,25 +49,21 @@ class FraccionesDB {
     }
   }
 
-  static Future actualizar(Fracciones value) async {
-    if (await existeNombre(value)) {
-      try {
-        var a = await coleccion.update(
-          where.eq("_id", value.idPadre),
-          value.toMap(),
-        );
-        return a["updatedExisting"];
-      } catch (e) {
-        print(e);
-        return false;
-      }
+  static Future<void> actualizar(Fracciones value) async {
+    try {
+      await coleccion.update(
+        where.eq("_id", value.id),
+        value.toMap(),
+      );
+    } catch (e) {
+      print(e);
     }
   }
 
   static Future<void> eliminar(Fracciones value) async {
     try {
       await coleccion.remove(
-        where.eq('_id', value.idPadre),
+        where.eq('_id', value.id),
       );
     } catch (e) {
       print(e);
@@ -76,8 +72,7 @@ class FraccionesDB {
 
   static Future<bool> existeNombre(Fracciones value) async {
     try {
-      final existe =
-          await coleccion.find(where.eq('_id', value.idPadre)).toList();
+      final existe = await coleccion.find(where.eq('_id', value.id)).toList();
 
       return existe.isEmpty;
     } catch (e) {

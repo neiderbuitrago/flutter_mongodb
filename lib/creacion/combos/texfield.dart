@@ -1,12 +1,14 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mongodb/db/combo.dart';
+
 import 'package:get/get.dart';
 
 import '../../estado_getx/combos_getx.dart';
 import '../../funciones_generales/numeros.dart';
+import '../../modelos/combo.dart';
 import '../validation_function.dart';
 
 class TexfieldCombos extends StatefulWidget {
@@ -92,7 +94,8 @@ class _TexfieldCombosState extends State<TexfieldCombos> {
                               estadoCombos.controlleresCombosDetalle[0].text)
                           .then((value) {
                         if (value != null) {
-                          estadoCombos.listaCombosFiltrados = value;
+                          estadoCombos.listaCombosFiltrados =
+                              Combos.fromMapList(value);
                         }
                       });
                     }

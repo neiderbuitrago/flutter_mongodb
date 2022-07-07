@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mongodb/creacion/productos/llenar_datos.dart';
 import 'package:flutter_mongodb/creacion/venta_x_cantidad/widget.dart';
+import 'package:flutter_mongodb/estado_getx/productos_getx.dart';
 import 'package:get/get.dart';
 
 import '../../estado_getx/venta_x_cantidad_getx.dart';
@@ -9,10 +11,7 @@ import 'text_from_fiel_venta_x_cantidad.dart';
 Future<dynamic> listaFlotanteVentaXCantidad({
   required BuildContext context,
 }) {
-  calcularGanancias(index: 2);
-  calcularGanancias(index: 6);
-  calcularGanancias(index: 10);
-  calcularGanancias(index: 14);
+  calcularGananciasVentaXcantidad();
   return showDialog(
     barrierColor: Colors.black.withOpacity(0.2),
     context: context,
@@ -48,6 +47,7 @@ class ListaSeleccion extends StatefulWidget {
 class _ListaSeleccionState extends State<ListaSeleccion> {
   final EstadoVentaXCantidad estadoVentaXCantidad =
       Get.find<EstadoVentaXCantidad>();
+  EstadoProducto estadoProducto = Get.find<EstadoProducto>();
 
   List<List<Widget>> listaDewidgetParaCard = [];
   bool datoValido = false;
@@ -56,6 +56,7 @@ class _ListaSeleccionState extends State<ListaSeleccion> {
   void initState() {
     super.initState();
     estadoVentaXCantidad.focusNode = [for (var i = 0; i < 17; i++) FocusNode()];
+    llenarVentaXCantidad(estadoProducto.productoConsultado.id);
   }
 
   llenarListaWidget() {

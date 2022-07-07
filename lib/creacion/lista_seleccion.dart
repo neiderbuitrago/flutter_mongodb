@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_mongodb/estado_getx/getx_productos.dart';
+import 'package:flutter_mongodb/estado_getx/productos_getx.dart';
+import 'package:flutter_mongodb/modelos/productos.dart';
 import 'package:get/get.dart';
 
 listaMarcaGrupoImpuesto(bool esProducto) {
@@ -51,14 +52,16 @@ listaMarcaGrupoImpuesto(bool esProducto) {
                     )
                   : null,
               trailing: (esProducto)
-                  ? Text('\$' '${marca.precioVenta1}',
+                  ? Text('\$' '${marca["precioVenta1"]}',
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ))
                   : null,
               onTap: () {
-                Navigator.of(context).pop(marca);
+                (esProducto)
+                    ? Navigator.of(context).pop(Productos.fromMap(marca))
+                    : Navigator.of(context).pop(marca);
               },
             );
           },

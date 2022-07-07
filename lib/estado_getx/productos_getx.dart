@@ -1,10 +1,10 @@
 // ignore_for_file: avoid_print
 
 import 'package:flutter/material.dart';
+import 'package:flutter_mongodb/modelos/combo.dart';
 import 'package:flutter_mongodb/modelos/tarifa_impuestos.dart';
 import 'package:get/get.dart';
 import 'package:mongo_dart/mongo_dart.dart';
-
 import '../modelos/marcas.dart';
 import '../modelos/productos.dart';
 
@@ -20,13 +20,14 @@ class EstadoProducto extends GetxController {
   var estadoDelProducto = true.obs;
   var colorTextovalido = false.obs;
   var cambiarSwitch = false.obs;
-  var idComboSeleccionado = 0.obs;
+
   var nombreComboSeleccionado = ''.obs;
   var seleccionTipoProducto = 'Activo'.obs;
   late MarcasGrupos marcaSeleccionada = <MarcasGrupos>{}.obs as MarcasGrupos;
   late MarcasGrupos grupoSeleccionado = <MarcasGrupos>{}.obs as MarcasGrupos;
   late Impuesto impuestoSeleccionado = <Impuesto>{}.obs as Impuesto;
-  var comboSeleccionado = 0.obs;
+  late Combos comboSeleccionado = <Combos>{}.obs as Combos;
+
   var marcasFiltradas = [].obs;
   List<TextEditingController> controladores = <TextEditingController>[].obs;
   List<FocusNode> focusNode = <FocusNode>[].obs;

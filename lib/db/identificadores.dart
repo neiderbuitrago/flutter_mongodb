@@ -1,11 +1,14 @@
 // ignore_for_file: avoid_print
 
+import 'package:flutter_mongodb/estado_getx/identificadores.dart';
 import 'package:flutter_mongodb/utilidades.dart';
+import 'package:get/get.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
 import '../modelos/identificador.dart';
 
 class IdentificadorDB {
+  // ignore: prefer_typing_uninitialized_variables
   static var db, coleccion;
 
   static Future<void> conectar() async {
@@ -16,12 +19,35 @@ class IdentificadorDB {
 
   static Future getParametro(ObjectId idPadre) async {
     try {
-      var datos = await coleccion
-          .find(
-              where.eq("idPadre", idPadre).sortBy("detalle", descending: false))
+      List datos = await coleccion
+          .find(where
+              .eq("idPadre", idPadre)
+              .sortBy("nombre", descending: false)
+              .sortBy("identificador", descending: false))
           .toList();
 
-      return datos;
+      return (datos.isEmpty)
+          ? null
+          : datos.map((e) => IdentificadorDetalle.fromMap(e)).toList();
+    } catch (e) {
+      print(e);
+      return Future.value();
+    }
+  }
+
+  static Future getIdentificador(
+      {required ObjectId idPadre, required String identificador}) async {
+    try {
+      List datos = await coleccion
+          .find(where
+              .eq("idPadre", idPadre)
+              .and(where.eq("identificador", identificador))
+              .sortBy("identificador", descending: false))
+          .toList();
+
+      return (datos.isEmpty)
+          ? null
+          : datos.map((e) => IdentificadorDetalle.fromMap(e)).toList();
     } catch (e) {
       print(e);
       return Future.value();
@@ -44,7 +70,6 @@ class IdentificadorDB {
     if (await existeNombre(valor)) {
       try {
         await coleccion.insertAll([valor.toMap()]);
-        print("marca insertada");
       } catch (e) {
         print(e);
       }
@@ -76,13 +101,19 @@ class IdentificadorDB {
 
   //comprobar si el nombre existe
   static Future<bool> existeNombre(IdentificadorDetalle nombre) async {
+    EstadoIdentificador estadoIdentificador = Get.find();
     try {
       final existe = await coleccion
-          .find(where.eq("idPadre", nombre.idPadre).or(where
+          .find(where.eq("idPadre", nombre.idPadre).and(where
               .eq("nombre", nombre.nombre)
-              .or(where.eq("identificador", nombre.identificador))))
+              .and(where.eq("identificador", nombre.identificador))))
           .toList();
-      return (existe.isEmpty) ? true : false;
+      return (existe.isEmpty)
+          ? true
+          : ((existe[0]['_id'] == nombre.id) &
+                  !estadoIdentificador.nuevoEditar.value)
+              ? true
+              : false;
     } catch (e) {
       print(e);
       return false;

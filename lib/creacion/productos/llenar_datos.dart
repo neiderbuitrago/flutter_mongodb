@@ -1,32 +1,30 @@
 // ignore_for_file: avoid_print
 
 import 'package:flutter_mongodb/creacion/productos/limpiar_form_productos.dart';
+import 'package:flutter_mongodb/creacion/venta_x_cantidad/widget.dart';
 import 'package:flutter_mongodb/db/combo.dart';
-import 'package:flutter_mongodb/db/identificadores.dart';
 import 'package:flutter_mongodb/db/marcas_mongo.dart';
 import 'package:flutter_mongodb/db/productos_mongo.dart';
 import 'package:flutter_mongodb/db/venta_x_cantida_mongo.dart';
-import 'package:flutter_mongodb/estado_getx/getx_marcas.dart';
+import 'package:flutter_mongodb/modelos/combo.dart';
 import 'package:flutter_mongodb/modelos/fracciones.dart';
 import 'package:get/get.dart';
+import 'package:mongo_dart/mongo_dart.dart';
 import '../../db/fracciones.dart';
 import '../../db/grupos_mongo.dart';
 import '../../db/tarifa_impuestos_mongo.dart';
 import '../../estado_getx/fracciones_getx.dart';
-import '../../estado_getx/getx_productos.dart';
-import '../../estado_getx/identificadores.dart';
+import '../../estado_getx/productos_getx.dart';
 import '../../estado_getx/venta_x_cantidad_getx.dart';
 import '../../funciones_generales/numeros.dart';
-import '../../modelos/identificador.dart';
 import '../../modelos/productos.dart';
+import '../../modelos/venta_x_cantidad.dart';
 
 llenarDatos({
   required String codigo,
 }) async {
   EstadoProducto estadoProducto = Get.find<EstadoProducto>();
-  EstadoIdentificador estadoIdentificador = Get.find<EstadoIdentificador>();
-  EstadoVentaFraccionada estadoFracciones = Get.find<EstadoVentaFraccionada>();
-  EstadoVentaXCantidad estadoVentaXCantidad = Get.find<EstadoVentaXCantidad>();
+  // EstadoIdentificador estadoIdentificador = Get.find<EstadoIdentificador>();
   var controladores = estadoProducto.controladores;
   Productos producto;
   ProductosDB.getcodigo(codigo).then(
@@ -37,18 +35,7 @@ llenarDatos({
               estadoProducto.productoConsultado = producto,
               estadoProducto.nuevoEditar.value = false,
               estadoProducto.controladores[0].text = producto.codigo,
-              if (producto.manejaIdentificador)
-                {
-                  estadoIdentificador.datosIdentificador.clear(),
-                  IdentificadorDB.getId(
-                    producto.id,
-                  ).then((identificador) {
-                    if (identificador != null) {
-                      estadoIdentificador.datosIdentificador =
-                          IdentificadorDetalle.toListMap(identificador);
-                    }
-                  })
-                },
+
               controladores[1].text = producto.nombre,
               MarcaDB.getId(producto.marcaId).then((value1) {
                 if (value1 != null) {
@@ -92,16 +79,18 @@ llenarDatos({
               estadoProducto.manejaIdentificador.value =
                   producto.manejaIdentificador,
               estadoProducto.manejaCombos.value = producto.manejaCombo,
-              ComboDB.getId(producto.id).then((value1) {
-                if (value1 != null) {
-                  estadoProducto.nombreComboSeleccionado.value =
-                      value1[0]['nombre'];
-                  estadoProducto.idComboSeleccionado.value = value1[0]['_id'];
-                } else {
-                  estadoProducto.nombreComboSeleccionado.value = '';
-                  estadoProducto.idComboSeleccionado.value = 0;
-                }
-              }),
+              // ComboDB.getId(producto.comboId).then((value1) {
+              //   if (value1 != null) {
+              //     estadoProducto.comboSeleccionado = Combos.fromMap(value1[0]);
+              //     estadoProducto.nombreComboSeleccionado.value =
+              //         value1[0]['nombre'];
+
+              //     estadoProducto.nuevoEditar.value = false;
+              //   } else {
+              //     estadoProducto.nombreComboSeleccionado.value = '';
+              //     estadoProducto.comboSeleccionado = Combos.defecto();
+              //   }
+              // }),
 
               //
               estadoProducto.manejaMulticodigos.value =
@@ -110,100 +99,6 @@ llenarDatos({
               estadoProducto.estadoDelProducto.value = producto.activoInactivo,
               estadoProducto.seleccionTipoProducto.value =
                   producto.tipoProducto,
-
-              //
-              if (producto.manejaFracciones)
-                {
-                  //EL CODIGO  DEL PRODUCTO ESTA EN LAS FRACCIONES
-
-                  FraccionesDB.getId(producto.id).then((value1) {
-                    if (value1 != null) {
-                      var datosfracciones = Fracciones.fromMap(value1);
-                      estadoFracciones.controladoresFraccion[0].text =
-                          enBlancoSiEsCero(datosfracciones.cantidadXEmpaque);
-
-                      estadoFracciones.controladoresFraccion[1].text =
-                          datosfracciones.nombre1;
-                      estadoFracciones.controladoresFraccion[2].text =
-                          enBlancoSiEsCero(datosfracciones.cantidadDescontar1);
-                      estadoFracciones.controladoresFraccion[3].text =
-                          enBlancoSiEsCero(datosfracciones.precio1);
-                      estadoFracciones.controladoresFraccion[5].text =
-                          datosfracciones.nombre2;
-                      estadoFracciones.controladoresFraccion[6].text =
-                          enBlancoSiEsCero(datosfracciones.cantidadDescontar2);
-                      estadoFracciones.controladoresFraccion[7].text =
-                          enBlancoSiEsCero(datosfracciones.precio2);
-                      estadoFracciones.controladoresFraccion[9].text =
-                          datosfracciones.nombre3;
-                      estadoFracciones.controladoresFraccion[10].text =
-                          enBlancoSiEsCero(datosfracciones.cantidadDescontar3);
-                      estadoFracciones.controladoresFraccion[11].text =
-                          enBlancoSiEsCero(datosfracciones.precio3);
-                      estadoFracciones.controladoresFraccion[13].text =
-                          datosfracciones.nombre4;
-                      estadoFracciones.controladoresFraccion[14].text =
-                          enBlancoSiEsCero(datosfracciones.cantidadDescontar4);
-                      estadoFracciones.controladoresFraccion[15].text =
-                          enBlancoSiEsCero(datosfracciones.precio4);
-                      estadoFracciones.controladoresFraccion[17].text =
-                          enBlancoSiEsCero(datosfracciones.cantidad);
-                      estadoFracciones.controladoresFraccion[18].text =
-                          enBlancoSiEsCero(datosfracciones.bodega1);
-                      estadoFracciones.controladoresFraccion[19].text =
-                          enBlancoSiEsCero(datosfracciones.bodega2);
-                      estadoFracciones.controladoresFraccion[20].text =
-                          enBlancoSiEsCero(datosfracciones.bodega3);
-                      estadoFracciones.controladoresFraccion[21].text =
-                          enBlancoSiEsCero(datosfracciones.bodega4);
-                      estadoFracciones.controladoresFraccion[22].text =
-                          enBlancoSiEsCero(datosfracciones.bodega5);
-                    }
-                  })
-                }
-              else
-                {
-                  //EL CODIGO  DEL PRODUCTO NO ESTA EN LAS FRACCIONES
-                  for (var element in estadoFracciones.controladoresFraccion)
-                    {element.text = ''}
-                },
-
-              //Venta por cantidad
-              VentaXCantidadDB.getId(producto.id).then(
-                (value1) {
-                  if (value1 != null) {
-                    estadoVentaXCantidad.controladoresVentaXCantidad[0].text =
-                        enBlancoSiEsCero(value1.desde1);
-                    estadoVentaXCantidad.controladoresVentaXCantidad[1].text =
-                        enBlancoSiEsCero(value1.hasta1);
-                    estadoVentaXCantidad.controladoresVentaXCantidad[2].text =
-                        enBlancoSiEsCero(value1.precio1);
-                    estadoVentaXCantidad.controladoresVentaXCantidad[4].text =
-                        enBlancoSiEsCero(value1.desde2);
-                    estadoVentaXCantidad.controladoresVentaXCantidad[5].text =
-                        enBlancoSiEsCero(value1.hasta2);
-                    estadoVentaXCantidad.controladoresVentaXCantidad[6].text =
-                        enBlancoSiEsCero(value1.precio2);
-                    estadoVentaXCantidad.controladoresVentaXCantidad[8].text =
-                        enBlancoSiEsCero(value1.desde3);
-                    estadoVentaXCantidad.controladoresVentaXCantidad[9].text =
-                        enBlancoSiEsCero(value1.hasta3);
-                    estadoVentaXCantidad.controladoresVentaXCantidad[10].text =
-                        enBlancoSiEsCero(value1.precio3);
-                    estadoVentaXCantidad.controladoresVentaXCantidad[12].text =
-                        enBlancoSiEsCero(value1.desde4);
-                    estadoVentaXCantidad.controladoresVentaXCantidad[13].text =
-                        enBlancoSiEsCero(value1.hasta4);
-                    estadoVentaXCantidad.controladoresVentaXCantidad[14].text =
-                        enBlancoSiEsCero(value1.precio4);
-                  } else {
-                    for (var element
-                        in estadoVentaXCantidad.controladoresVentaXCantidad) {
-                      element.text = '';
-                    }
-                  }
-                },
-              )
             }
           : {
               limpiarTextos(index: 1),
@@ -212,3 +107,83 @@ llenarDatos({
     },
   );
 }
+
+llenarFracciones(ObjectId id) {
+  EstadoVentaFraccionada estadoFracciones = Get.find<EstadoVentaFraccionada>();
+  List controlador = estadoFracciones.controladoresFraccion;
+  FraccionesDB.getId(id).then((value1) {
+    if (value1 != null) {
+      var fraccion = Fracciones.fromMap(value1[0]);
+      estadoFracciones.fraccionesConsultadas = fraccion;
+      estadoFracciones.nuevoEditar.value = false;
+      controlador[0].text = enBlancoSiEsCero(fraccion.cantidadXEmpaque);
+      controlador[1].text = fraccion.nombre1;
+      controlador[2].text = enBlancoSiEsCero(fraccion.cantidadDescontar1);
+      controlador[3].text = enBlancoSiEsCero(fraccion.precio1);
+      controlador[5].text = fraccion.nombre2;
+      controlador[6].text = enBlancoSiEsCero(fraccion.cantidadDescontar2);
+      controlador[7].text = enBlancoSiEsCero(fraccion.precio2);
+      controlador[9].text = fraccion.nombre3;
+      controlador[10].text = enBlancoSiEsCero(fraccion.cantidadDescontar3);
+      controlador[11].text = enBlancoSiEsCero(fraccion.precio3);
+      controlador[13].text = fraccion.nombre4;
+      controlador[14].text = enBlancoSiEsCero(fraccion.cantidadDescontar4);
+      controlador[15].text = enBlancoSiEsCero(fraccion.precio4);
+      controlador[17].text = enBlancoSiEsCero(fraccion.cantidad);
+      controlador[18].text = enBlancoSiEsCero(fraccion.bodega1);
+      controlador[19].text = enBlancoSiEsCero(fraccion.bodega2);
+      controlador[20].text = enBlancoSiEsCero(fraccion.bodega3);
+      controlador[21].text = enBlancoSiEsCero(fraccion.bodega4);
+      controlador[22].text = enBlancoSiEsCero(fraccion.bodega5);
+      estadoFracciones.calcularGanancias();
+    } else {
+      for (var element in controlador) {
+        element.text = '';
+      }
+      estadoFracciones.nuevoEditar.value = true;
+    }
+  });
+}
+
+llenarVentaXCantidad(ObjectId id) {
+  EstadoVentaXCantidad estadoVentaXCantidad = Get.find<EstadoVentaXCantidad>();
+  List controlador = estadoVentaXCantidad.controladoresVentaXCantidad;
+  VentaXCantidadDB.getId(id).then(
+    (value1) {
+      if (value1 != null) {
+        estadoVentaXCantidad.nuevoEditar.value = false;
+        VentaXCantidad valor = VentaXCantidad.fromMap(value1[0]);
+        controlador[0].text = enBlancoSiEsCero(valor.desde1);
+        controlador[1].text = enBlancoSiEsCero(valor.hasta1);
+        controlador[2].text = enBlancoSiEsCero(valor.precio1);
+        controlador[4].text = enBlancoSiEsCero(valor.desde2);
+        controlador[5].text = enBlancoSiEsCero(valor.hasta2);
+        controlador[6].text = enBlancoSiEsCero(valor.precio2);
+        controlador[8].text = enBlancoSiEsCero(valor.desde3);
+        controlador[9].text = enBlancoSiEsCero(valor.hasta3);
+        controlador[10].text = enBlancoSiEsCero(valor.precio3);
+        controlador[12].text = enBlancoSiEsCero(valor.desde4);
+        controlador[13].text = enBlancoSiEsCero(valor.hasta4);
+        controlador[14].text = enBlancoSiEsCero(valor.precio4);
+        calcularGananciasVentaXcantidad();
+      } else {
+        for (var element in controlador) {
+          element.text = '';
+        }
+        estadoVentaXCantidad.nuevoEditar.value = true;
+      }
+    },
+  );
+}
+
+// llenarIdentificador(producto.manejaIdentificador)
+//                 {
+//                   estadoIdentificador.mapIdentificador.clear();
+//                   IdentificadorDB.getId(
+//                     producto.id,
+//                   ).then((identificador) {
+//                     if (identificador != null) {
+//                       estadoIdentificador.mapIdentificador = identificador;
+//                     }
+//                   })
+//                 },

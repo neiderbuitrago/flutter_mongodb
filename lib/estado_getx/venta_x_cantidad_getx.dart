@@ -3,8 +3,12 @@ import 'package:get/get.dart';
 
 class EstadoVentaXCantidad extends GetxController {
   List<TextEditingController> controladoresVentaXCantidad =
-      <TextEditingController>[].obs;
+      <TextEditingController>[
+    for (var i = 0; i < 16; i++) TextEditingController()
+  ].obs;
   List<FocusNode> focusNode = <FocusNode>[].obs;
+
+  var nuevoEditar = true.obs;
   late Map<int, bool> datosValidosVentaXCantidad = {
     1: true,
     4: true,
@@ -22,8 +26,6 @@ class EstadoVentaXCantidad extends GetxController {
   ];
   changeValue(int key, bool value) {
     datosValidosVentaXCantidad[key] = value;
-    datosValidosVentaXCantidad.forEach((key, value) {
-      print('key   $key: value $value');
-    });
+    datosValidosVentaXCantidad.forEach((key, value) {});
   }
 }

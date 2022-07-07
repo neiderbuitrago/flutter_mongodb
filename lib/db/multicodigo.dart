@@ -10,7 +10,7 @@ class MulticodigoDB {
   static Future<void> conectar() async {
     db = await Db.create(url);
     await db.open();
-    coleccion = await db.collection("Multicodigo");
+    coleccion = await db.collection("multicodigo");
   }
 
   static Future getParametro(ObjectId idProducto) async {
@@ -20,6 +20,7 @@ class MulticodigoDB {
               .eq("idProducto", idProducto)
               .sortBy("detalle", descending: false))
           .toList();
+      (datos.isEmpty) ? null : (Multicodigo.fromMapList(datos));
 
       return datos;
     } catch (e) {
@@ -78,11 +79,15 @@ class MulticodigoDB {
   static Future<bool> existeNombre(Multicodigo nombre) async {
     try {
       final existe = await coleccion
-          .find(where.eq("codigo", nombre.codigo).or(where
+          .find(where
               .eq("idProducto", nombre.idProducto)
-              .or(where.eq("detalle", nombre.detalle))))
+              .and(where.eq("codigo", nombre.codigo)))
           .toList();
-      return (existe.isEmpty) ? true : false;
+      return (existe.isEmpty)
+          ? true
+          : (existe[0]['_id'] == nombre.id)
+              ? true
+              : false;
     } catch (e) {
       print(e);
       return false;

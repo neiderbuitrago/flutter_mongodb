@@ -1,13 +1,14 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../../estado_getx/fracciones_getx.dart';
 import '../../funciones_generales/numeros.dart';
 import '../../funciones_generales/response.dart';
+import '../../funciones_generales/strings.dart';
 import '../../modelos/fracciones.dart';
-import '../venta_x_cantidad/widget.dart';
 
 class TexfieldFracciones extends StatefulWidget {
   const TexfieldFracciones({
@@ -29,6 +30,17 @@ class _TexfieldFraccionesState extends State<TexfieldFracciones> {
       Get.find<EstadoVentaFraccionada>();
   @override
   Widget build(BuildContext context) {
+    //Agregar un oyente a los siguientes controladores
+    // para colocar su contenido en mayuscualas
+    bool stringDouble = (widget.index == 1 ||
+        widget.index == 5 ||
+        widget.index == 9 ||
+        widget.index == 13);
+    if (stringDouble) {
+      campoEnMayusculas(
+          controller:
+              estadoVentaFraccionada.controladoresFraccion[widget.index]);
+    }
     return Padding(
       padding: const EdgeInsets.all(5.0),
       child: Container(
@@ -61,34 +73,34 @@ class _TexfieldFraccionesState extends State<TexfieldFracciones> {
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 15, vertical: 2),
             ),
+            inputFormatters: (!stringDouble)
+                ? [FilteringTextInputFormatter.allow(RegExp('[0-9-.]'))]
+                : [],
             onChanged: (widget.index == 3 ||
                     widget.index == 7 ||
                     widget.index == 11 ||
                     widget.index == 15)
                 ? (value) {
-                    estadoVentaFraccionada.calcularGanancias(
-                      index: widget.index,
-                    );
+                    estadoVentaFraccionada.calcularGanancias();
                   }
                 : (widget.index == 4 ||
                         widget.index == 8 ||
                         widget.index == 12 ||
                         widget.index == 16)
                     ? (value) {
-                        double pc = comprovarSihayNumero(
+                        double pc = numeroDecimal(
                             estadoVentaFraccionada.costoGeneralProducto.value);
 
-                        double cxe = comprovarSihayNumero(estadoVentaFraccionada
+                        double cxe = numeroDecimal(estadoVentaFraccionada
                             .controladoresFraccion[0].text);
-                        double cantidadDescontar = comprovarSihayNumero(
+                        double cantidadDescontar = numeroDecimal(
                             estadoVentaFraccionada
                                 .controladoresFraccion[widget.index - 2].text);
 
                         double costoFraccion = (pc / cxe) * cantidadDescontar;
 
                         int precioVenta =
-                            ((costoFraccion * comprovarSihayNumero(value)) /
-                                        100 +
+                            ((costoFraccion * numeroDecimal(value)) / 100 +
                                     costoFraccion)
                                 .toInt();
 
@@ -254,35 +266,35 @@ class CantidadesBodega1 extends StatelessWidget {
   }
 }
 
-llanarDatos() {
+llanarDatosfracciones() {
   EstadoVentaFraccionada estadoFracciones = Get.find<EstadoVentaFraccionada>();
 
   Fracciones fracciones = estadoFracciones.fraccionesConsultadas;
   List controlador = estadoFracciones.controladoresFraccion;
   estadoFracciones.controladoresFraccion[0].text =
-      quitarDecimales(fracciones.cantidad).toString();
+      enBlancoSiEsCero(fracciones.cantidad).toString();
 
   controlador[1].text = fracciones.nombre1;
-  controlador[2].text = quitarDecimales(fracciones.cantidadDescontar1);
-  controlador[3].text = quitarDecimales(fracciones.precio1);
+  controlador[2].text = enBlancoSiEsCero(fracciones.cantidadDescontar1);
+  controlador[3].text = enBlancoSiEsCero(fracciones.precio1);
   //
   controlador[5].text = fracciones.nombre2;
-  controlador[6].text = quitarDecimales(fracciones.cantidadDescontar2);
-  controlador[7].text = quitarDecimales(fracciones.precio2);
+  controlador[6].text = enBlancoSiEsCero(fracciones.cantidadDescontar2);
+  controlador[7].text = enBlancoSiEsCero(fracciones.precio2);
   //
   controlador[9].text = fracciones.nombre3;
-  controlador[10].text = quitarDecimales(fracciones.cantidadDescontar3);
-  controlador[11].text = quitarDecimales(fracciones.precio3);
+  controlador[10].text = enBlancoSiEsCero(fracciones.cantidadDescontar3);
+  controlador[11].text = enBlancoSiEsCero(fracciones.precio3);
   //
   controlador[13].text = fracciones.nombre4;
-  controlador[14].text = quitarDecimales(fracciones.cantidadDescontar4);
-  controlador[15].text = quitarDecimales(fracciones.precio4);
+  controlador[14].text = enBlancoSiEsCero(fracciones.cantidadDescontar4);
+  controlador[15].text = enBlancoSiEsCero(fracciones.precio4);
   //
-  controlador[17].text = fracciones.cantidad;
+  controlador[17].text = enBlancoSiEsCero(fracciones.cantidad);
 
-  controlador[18].text = quitarDecimales(fracciones.bodega1);
-  controlador[19].text = quitarDecimales(fracciones.bodega2);
-  controlador[20].text = quitarDecimales(fracciones.bodega3);
-  controlador[21].text = quitarDecimales(fracciones.bodega4);
-  controlador[22].text = quitarDecimales(fracciones.bodega5);
+  controlador[18].text = enBlancoSiEsCero(fracciones.bodega1);
+  controlador[19].text = enBlancoSiEsCero(fracciones.bodega2);
+  controlador[20].text = enBlancoSiEsCero(fracciones.bodega3);
+  controlador[21].text = enBlancoSiEsCero(fracciones.bodega4);
+  controlador[22].text = enBlancoSiEsCero(fracciones.bodega5);
 }

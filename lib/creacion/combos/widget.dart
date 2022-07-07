@@ -1,18 +1,12 @@
 // ignore_for_file: avoid_print
 
 import 'package:flutter/material.dart';
-import 'package:flutter_mongodb/db/combo.dart';
 import 'package:get/get.dart';
 import '../../estado_getx/combos_getx.dart';
-import '../../estado_getx/getx_productos.dart';
+import '../../estado_getx/productos_getx.dart';
 import '../../funciones_generales/response.dart';
-import '../../modelos/combo.dart';
-import '../../modelos/combo_detalle.dart';
-import '../productos/cuadro_flotante_consulta_productos.dart';
+import '../../funciones_generales/strings.dart';
 import 'lista_seleccionar.dart';
-
-//import '../../modelo_datos/detalle_combo.dart';
-//import '../../modelo_datos/productos_combos_detalle.dart';
 
 class TexfildFiltro extends StatefulWidget {
   const TexfildFiltro({
@@ -34,80 +28,47 @@ class TexfildFiltro extends StatefulWidget {
 }
 
 class _TexfildFiltroState extends State<TexfildFiltro> {
-  String _letrasFiltro = '';
-
+  EstadoCombos estadoCombos = Get.find<EstadoCombos>();
   bool llenarDatoTraido = true;
-
-  List<dynamic> marcasFiltradas = [];
-  TextEditingController controllerFiltro = TextEditingController();
-  List<dynamic> datosFiltrados = [];
-  llamandoFiltrarValores() async {
-    datosFiltrados = await ComboDB.getParametro(widget.letrasparaBuscar ?? "");
-  }
 
   @override
   Widget build(BuildContext context) {
-    String letrasparaBuscar = widget.letrasparaBuscar ?? '';
-
-    return ListView.builder(itemBuilder: (context, index) {
-      datosFiltrados.length;
-
-      llamandoFiltrarValores();
-
-      if (letrasparaBuscar != '' && llenarDatoTraido) {
-        ///si se trae un dato de una pantalla anterior
-        llenarDatoTraido = false;
-        _letrasFiltro = letrasparaBuscar;
-        controllerFiltro.text = letrasparaBuscar;
-      }
-      AnchoDePantalla medidas = anchoPantalla(context);
-      return SizedBox(
-        width: medidas.anchoLista,
-        // height: medidas.alto * 0.6,
-        child: Column(
-          children: [
-            SizedBox(
-              width: medidas.anchoLista,
-              height: 50,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  SizedBox(
-                    width: medidas.anchoLista - 120,
-                    child: TextField(
-                      autofocus: true,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        hintText: 'Buscar',
-                      ),
-                      controller: controllerFiltro,
-                      onChanged: (value) {
-                        setState(() {
-                          _letrasFiltro = value;
-                          llamandoFiltrarValores();
-                        });
-                      },
-                      onSubmitted: (value) {
-                        listaFlotanteConsulta(
-                          context: context,
-                          coleccion: "Procustos",
-                        );
-                      },
-                    ),
-                  ),
-                ],
+    campoEnMayusculas(controller: estadoCombos.controllerFiltro);
+    estadoCombos.controllerFiltro.text = widget.letrasparaBuscar ?? '';
+    AnchoDePantalla medidas = anchoPantalla(context);
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 28),
+          child: TextField(
+            autofocus: true,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(30),
               ),
+              suffixIcon: const Icon(
+                Icons.search,
+                color: Colors.black,
+                size: 30,
+              ),
+              hintText: 'Buscar',
             ),
-            const ListaCombos(
-              esEditable: false,
-              // cambioDetalleNombre: () {},
-            )
-          ],
+            controller: estadoCombos.controllerFiltro,
+            onChanged: (value) {
+              estadoCombos.filtrarCombos(value);
+            },
+          ),
         ),
-      );
-    });
+        const SizedBox(height: 10),
+        SizedBox(
+          width: medidas.anchoLista,
+          height: medidas.alto * 0.6,
+          child: const ListaCombos(
+            esEditable: false,
+          ),
+        )
+      ],
+    );
   }
 }
 
