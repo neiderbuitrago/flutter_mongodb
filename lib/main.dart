@@ -1,8 +1,7 @@
 // ignore_for_file: avoid_print
-
 import 'package:flutter/material.dart';
+import 'package:flutter_mongodb/creacion/presentacion/creacion_presentacion.dart';
 import 'package:flutter_mongodb/db/combo.dart';
-
 import 'package:flutter_mongodb/db/empresa_mongo.dart';
 import 'package:flutter_mongodb/db/identificadores.dart';
 import 'package:flutter_mongodb/db/multicodigo.dart';
@@ -16,6 +15,7 @@ import 'creacion/tarifa_impuestos/creacion_impuesto.dart';
 import 'db/fracciones.dart';
 import 'db/grupos_mongo.dart';
 import 'db/marcas_mongo.dart';
+import 'db/presentacion.dart';
 import 'db/productos_mongo.dart';
 import 'db/tarifa_impuestos_mongo.dart';
 import 'db/venta_x_cantida_mongo.dart';
@@ -35,6 +35,7 @@ void main() async {
   await IdentificadorDB.conectar();
   await FraccionesDB.conectar();
   await VentaXCantidadDB.conectar();
+  await PresentacionDB.conectar();
 
   runApp(const MyApp());
 }
@@ -85,6 +86,7 @@ class _MyAppState extends State<MyApp> {
     const CreacionMarca(),
     const CreacionGrupo(),
     const CreacionImpuestos(),
+    const CreacionPresentacion(),
   ];
 
   @override
@@ -118,6 +120,10 @@ class _MyAppState extends State<MyApp> {
               icon: Icon(Icons.attach_money_outlined),
               label: 'Impuestos',
             ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.auto_awesome_mosaic_outlined),
+              label: 'Presentaciones',
+            ),
           ],
           currentIndex: _selectedIndex,
           selectedItemColor: Colors.amber[800],
@@ -125,6 +131,5 @@ class _MyAppState extends State<MyApp> {
         ),
       ),
     );
-    //return materialApp;
   }
 }

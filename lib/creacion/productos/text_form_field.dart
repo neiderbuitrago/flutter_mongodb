@@ -16,7 +16,6 @@ import '../combos/cuadro_flotante_combos.dart';
 import '../fracciones/cuadro_flotante_venta_fraccionada.dart';
 import '../identificadores/creacion_identificador.dart';
 import '../multicodigos/creacion_multicodigos.dart';
-import '../multicodigos/lista_multicodigo.dart';
 import '../venta_x_cantidad/cuadro_flotante_venta_x_cantidad.dart';
 import '../widget.dart';
 import 'cuadro_flotante_consulta_productos.dart';
@@ -45,7 +44,7 @@ class _TextFormFieldProductoState extends State<TextFormFieldProducto> {
   final EstadoIdentificador estadoIdentificador =
       Get.find<EstadoIdentificador>();
   final EstadoProducto estadoProducto = Get.find<EstadoProducto>();
-  final String _texto = '';
+  late String _texto = '';
 
   bool comprovarSiHayValores(
     int cuantosCamposExaminara,
@@ -64,8 +63,8 @@ class _TextFormFieldProductoState extends State<TextFormFieldProducto> {
   @override
   initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // executes after build
+    nuevoCodigostring().then((value) {
+      _texto = value.toString();
     });
 
     campoEnMayusculas(controller: estadoProducto.controladores[0]);
@@ -216,19 +215,9 @@ class _TextFormFieldProductoState extends State<TextFormFieldProducto> {
     var textFormField2 = TextFormField(
       maxLines: null,
       autocorrect: true,
-      validator: (widget.index < 8)
-          ? (value) {
-              if (value!.isEmpty) {
-                return null;
-              }
-              return null;
-            }
-          : null,
       onTap: (widget.index == 0)
           ? () {
-              nuevoCodigostring().then((value) {
-                print(value);
-              });
+              nuevoCodigostring().then((value) {});
             }
           : (widget.index == 1)
               ? () {
@@ -265,9 +254,25 @@ class _TextFormFieldProductoState extends State<TextFormFieldProducto> {
                         },
                       );
                     }
-                  : () {
-                      print(widget.index);
-                    },
+                  : (widget.index == 17)
+                      ? () {
+                          listaFlotanteConsulta(
+                            context: context,
+                            coleccion: "Presentacion",
+                            index: widget.index,
+                          ).then(
+                            (value) {
+                              print(value);
+                              if (value != null) {
+                                estadoProducto.guardarIdPresentacion(
+                                    index: widget.index, value: value);
+                              }
+                            },
+                          );
+                        }
+                      : () {
+                          print(widget.index);
+                        },
       focusNode: estadoProducto.focusNode[widget.index],
       keyboardType:
           (widget.index >= 5 && widget.index != 21 && widget.index != 17)
@@ -295,6 +300,25 @@ class _TextFormFieldProductoState extends State<TextFormFieldProducto> {
               (widget.index < estadoProducto.focusNode.length)
                   ? widget.index + 1
                   : 0]);
+          if (widget.index == 1 || widget.index == 2 || widget.index == 3) {
+            listaFlotanteConsulta(
+              context: context,
+              coleccion: (widget.index == 1)
+                  ? "Marca"
+                  : (widget.index == 2)
+                      ? "Grupo"
+                      : "Impuesto",
+              index: widget.index + 1,
+            ).then(
+              (value) {
+                print(value);
+                if (value != null) {
+                  estadoProducto.guardarIdMarcaGrupoImpuesto(
+                      index: widget.index + 1, value: value);
+                }
+              },
+            );
+          }
         }
       },
       controller: estadoProducto.controladores[widget.index],
@@ -303,6 +327,7 @@ class _TextFormFieldProductoState extends State<TextFormFieldProducto> {
           borderRadius: BorderRadius.circular(30),
           borderSide: const BorderSide(
               color: Color.fromARGB(255, 111, 40, 226), width: 1),
+          // Colors.red),
         ),
         focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(30),
@@ -311,7 +336,11 @@ class _TextFormFieldProductoState extends State<TextFormFieldProducto> {
               width: 2.0,
             )),
         labelText: estadoProducto.campos[widget.index],
-        hintText: _texto,
+        hintText: (widget.index == 0) ? _texto : "",
+        labelStyle: const TextStyle(
+          color: Color.fromARGB(255, 117, 115, 115),
+          fontSize: 20,
+        ),
         hintStyle: const TextStyle(fontSize: 15, color: Colors.blue),
         contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 2),
       ),
@@ -345,10 +374,10 @@ class _TextFormFieldProductoState extends State<TextFormFieldProducto> {
                     fontFamily: 'Open Sans',
                   ),
                 )
-              : ColocarTextoAdicional(
-                  primerTexto: estadoProducto.campos[widget.index],
-                  segundoTexto: estadoProducto.comboSeleccionado.nombre,
-                )
+              : Obx(() => ColocarTextoAdicional(
+                    primerTexto: estadoProducto.campos[widget.index],
+                    segundoTexto: estadoProducto.nombreComboSeleccionado.value,
+                  ))
           : (widget.index == 28)
               ? ColocarTextoAdicional(
                   primerTexto: estadoProducto.campos[widget.index],
@@ -442,9 +471,9 @@ class _TextFormFieldProductoState extends State<TextFormFieldProducto> {
                             (value) {
                               if (value != null) {
                                 estadoProducto.comboSeleccionado = value;
+                                estadoProducto.nombreComboSeleccionado.value =
+                                    value.nombre;
                               } else {
-                                //cambiar el estado del switch
-                                //si no se selecciona un combo
                                 estadoProducto.funtionHabilitar(
                                     index: widget.index);
                                 estadoProducto.comboSeleccionado =

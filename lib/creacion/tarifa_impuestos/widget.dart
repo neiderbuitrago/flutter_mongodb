@@ -25,7 +25,7 @@ class TextFormFieldTarifa extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     EstadoTarImpuestos estadoTarImpuestos = Get.find<EstadoTarImpuestos>();
-
+    FocusScope.of(context).requestFocus(estadoTarImpuestos.focusNode[0]);
     campoEnMayusculas(controller: estadoTarImpuestos.controlador[0]);
 
     return TextField(
@@ -147,6 +147,9 @@ class ListaImpuestos extends StatelessWidget {
                         estadoTarImpuestos.limpiarCampos();
                         estadoTarImpuestos.getFilterList("");
                       });
+                    } else {
+                      estadoTarImpuestos.limpiarCampos();
+                      estadoTarImpuestos.getFilterList("");
                     }
                   },
                 );

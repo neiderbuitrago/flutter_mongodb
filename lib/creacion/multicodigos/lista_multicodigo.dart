@@ -56,12 +56,12 @@ class ListaMulticodigo extends GetView<EstadoMulticodigos> {
 
                           onTap: () {
                             _.editarMulticodigo(codigo);
-                            print(""" 
-                                    codigo ${codigo.codigo}
-                                     detalle ${codigo.detalle}
-                                     idProducto ${codigo.idProducto}
-                                     sincronizado ${codigo.sincronizado}
-                                     """);
+                            // print("""
+                            //         codigo ${codigo.codigo}
+                            //          detalle ${codigo.detalle}
+                            //          idProducto ${codigo.idProducto}
+                            //          sincronizado ${codigo.sincronizado}
+                            //          """);
                           },
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),

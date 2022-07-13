@@ -3,13 +3,16 @@ import 'package:flutter_mongodb/estado_getx/productos_getx.dart';
 import 'package:flutter_mongodb/modelos/productos.dart';
 import 'package:get/get.dart';
 
+import '../funciones_generales/numeros.dart';
+
 listaMarcaGrupoImpuesto(bool esProducto) {
   EstadoProducto estadoProducto = Get.find<EstadoProducto>();
+  // MarcaDB.getParametro("");
+
   return Expanded(
     child: SizedBox(
       child: Obx(
         () => ListView.builder(
-          // shrinkWrap: true,
           itemCount: estadoProducto.marcasFiltradas.length,
           itemBuilder: (context, index) {
             final marca = estadoProducto.marcasFiltradas[index];
@@ -41,18 +44,22 @@ listaMarcaGrupoImpuesto(bool esProducto) {
                   ? Text(
                       marca["codigo"] +
                           '    Existe: ' +
-                          marca["cantidad"].toString() +
-                          '    Marca: ',
-                      //  boxMarcas.get(marca.marcas).nombre,
+                          quitarDecimales(marca["cantidad"]).toString() +
+                          '    Marca: ${marca["nombreMarca"]} ',
                       style: const TextStyle(
-                        fontSize: 13,
+                        fontSize: 15,
                         fontWeight: FontWeight.w400,
-                        color: Colors.black45,
+                        color: Colors.black54,
                       ),
                     )
                   : null,
               trailing: (esProducto)
-                  ? Text('\$' '${marca["precioVenta1"]}',
+
+                  //colocar los puntos de miles y decimales
+
+                  ? Text(
+                      '\$'
+                      '${puntosDeMil(quitarDecimales(marca["precioVenta1"]).toString())}',
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,

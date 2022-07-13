@@ -29,11 +29,16 @@ class ComboDB {
     }
   }
 
-  static Future getId(ObjectId id) async {
+  static getId(ObjectId id) async {
     try {
       List datos = await coleccion.find(where.id(id)).toList();
       //  print(datos);
-      return (datos.isEmpty) ? null : (Combos.fromMapList(datos))[0];
+      if (datos.isEmpty) {
+        return null;
+      } else {
+        List<Combos> lista = Combos.fromMapList(datos);
+        return lista[0];
+      }
     } catch (e) {
       print(e);
 

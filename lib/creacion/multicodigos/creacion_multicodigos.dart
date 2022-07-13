@@ -1,7 +1,7 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter_mongodb/creacion/multicodigos/widget.dart';
-import 'package:flutter_mongodb/db/multicodigo.dart';
 import 'package:flutter_mongodb/estado_getx/productos_getx.dart';
-import 'package:flutter_mongodb/modelos/multicodigo.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import '../../estado_getx/multicodigo_getx.dart';
@@ -18,13 +18,13 @@ Future<dynamic> listaFlotanteMulticodigos({
     barrierColor: Colors.black.withOpacity(0.2),
     context: context,
     builder: (context) {
-      return Dialog(
-        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-        shape: const RoundedRectangleBorder(
+      return const Dialog(
+        backgroundColor: Color.fromARGB(255, 255, 255, 255),
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(20.0)),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: EdgeInsets.all(12),
           child: Multicodigos(),
         ),
       );
@@ -32,8 +32,9 @@ Future<dynamic> listaFlotanteMulticodigos({
   );
 }
 
-// ignore: use_key_in_widget_constructors
 class Multicodigos extends StatefulWidget {
+  const Multicodigos({super.key});
+
   @override
   _MulticodigosState createState() => _MulticodigosState();
 }
@@ -44,6 +45,7 @@ class _MulticodigosState extends State<Multicodigos> {
 
   @override
   Widget build(BuildContext context) {
+    estadoMulticodigos.context = context;
     campoEnMayusculas(controller: estadoMulticodigos.controllerMulticodigo[1]);
     campoEnMayusculas(controller: estadoMulticodigos.controllerMulticodigo[2]);
     estadoMulticodigos.nombreProducto.value =

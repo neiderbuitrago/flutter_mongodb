@@ -5,7 +5,9 @@ import 'package:flutter_mongodb/modelos/combo.dart';
 import 'package:flutter_mongodb/modelos/tarifa_impuestos.dart';
 import 'package:get/get.dart';
 import 'package:mongo_dart/mongo_dart.dart';
+import '../creacion/widget.dart';
 import '../modelos/marcas.dart';
+import '../modelos/presentacion.dart';
 import '../modelos/productos.dart';
 
 class EstadoProducto extends GetxController {
@@ -26,6 +28,8 @@ class EstadoProducto extends GetxController {
   late MarcasGrupos marcaSeleccionada = <MarcasGrupos>{}.obs as MarcasGrupos;
   late MarcasGrupos grupoSeleccionado = <MarcasGrupos>{}.obs as MarcasGrupos;
   late Impuesto impuestoSeleccionado = <Impuesto>{}.obs as Impuesto;
+  late Presentacion presentacionSeleccionada =
+      <Presentacion>{}.obs as Presentacion;
   late Combos comboSeleccionado = <Combos>{}.obs as Combos;
 
   var marcasFiltradas = [].obs;
@@ -111,6 +115,13 @@ class EstadoProducto extends GetxController {
     }
   }
 
+  guardarIdPresentacion({required int index, required value}) {
+    if (value != null) {
+      presentacionSeleccionada = Presentacion.fromMap(value);
+      controladores[index].text = presentacionSeleccionada.nombre;
+    }
+  }
+
   List<String> campos = [
     'Codigo',
     'Nombre',
@@ -167,5 +178,10 @@ class EstadoProducto extends GetxController {
         estadoDelProducto.value = !estadoDelProducto.value;
         break;
     }
+  }
+
+  sigienteCodigo() async {
+    nuevoCodigostring()
+        .then((value) => controladores[0].text = value.toString());
   }
 }

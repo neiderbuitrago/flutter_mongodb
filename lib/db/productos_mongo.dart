@@ -49,7 +49,11 @@ class ProductosDB {
 //consultar todos los codigos de barras
   static Future getcodigoAll() async {
     try {
-      var datos = await coleccionProductos.find().fields(["codigo"]).toList();
+      var datos = await coleccionProductos
+          .find(where
+              .match("nombre", "")
+              .fields(['codigo']).sortBy('codigo', descending: false))
+          .toList();
       return datos;
     } catch (e) {
       print(e);
@@ -73,29 +77,33 @@ class ProductosDB {
   //   }
   // }
 
-  static Future<void> insertar(Productos datos) async {
+  static Future insertar(Productos datos) async {
     //comprovar si existe
 
-    if (await existeNombre(datos)) {
+    if (!await existeNombre(datos)) {
       try {
-        await coleccionProductos.insertAll([datos.toMap()]);
-        print("Producto insertada");
+        var value = await coleccionProductos.insertAll([datos.toMap()]);
+        print(value);
+        return true;
       } catch (e) {
         print(e);
       }
+    } else {
+      return false;
     }
   }
 
-  static Future<void> actualizar(Productos datos) async {
+  static Future actualizar(Productos datos) async {
     if (!await existeNombre(datos)) {
       try {
         await coleccionProductos.update(
-          where.eq("_id", datos.id),
-          datos.toMap(),
-        );
+            where.eq("_id", datos.id), datos.toMap());
+        return true;
       } catch (e) {
         print(e);
       }
+    } else {
+      return false;
     }
   }
 
@@ -123,12 +131,12 @@ class ProductosDB {
           : (existe[0]["_id"] == nombre.id)
               ? false
               : true;
-      resultado = existe
-          .map((e) {
-            return e["_id"] != nombre.id;
-          })
-          .toList()
-          .contains(true);
+      // resultado = existe
+      //     .map((e) {
+      //       return e["_id"] != nombre.id;
+      //     })
+      //     .toList()
+      //     .contains(true);
       print("producto existe $resultado");
       return resultado;
     } catch (e) {

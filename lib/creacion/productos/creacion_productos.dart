@@ -2,9 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_mongodb/creacion/productos/text_form_field.dart';
-import 'package:flutter_mongodb/db/marcas_mongo.dart';
+import 'package:flutter_mongodb/db/presentacion.dart';
 import 'package:flutter_mongodb/estado_getx/combos_getx.dart';
 import 'package:flutter_mongodb/estado_getx/multicodigo_getx.dart';
+import 'package:flutter_mongodb/estado_getx/presentacion_getx.dart';
 
 import 'package:flutter_mongodb/estado_getx/productos_getx.dart';
 import 'package:flutter_mongodb/estado_getx/venta_x_cantidad_getx.dart';
@@ -14,6 +15,7 @@ import 'package:get/get.dart';
 import '../../estado_getx/identificadores.dart';
 import '../../funciones_generales/response.dart';
 import '../../modelos/marcas.dart';
+import '../../modelos/presentacion.dart';
 import 'botonGuardar.dart';
 
 class CreacionProductos extends StatefulWidget {
@@ -29,13 +31,27 @@ class _CreacionProductosState extends State<CreacionProductos> {
   EstadoIdentificador estadoIdentificador = Get.put(EstadoIdentificador());
   EstadoMulticodigos estadoMulticodigos = Get.put(EstadoMulticodigos());
   EstadoCombos estadoCombos = Get.put(EstadoCombos());
+  EstadoPresentacion estadoPresentacion = Get.put(EstadoPresentacion());
+  @override
+  void initState() {
+    estadoProducto.marcaSeleccionada = MarcasGrupos.defecto();
+    estadoProducto.grupoSeleccionado = MarcasGrupos.defecto();
+    estadoProducto.comboSeleccionado = Combos.defecto();
+    PresentacionDB.getUnidad("UNIDAD").then((value) {
+      if (value != null) {
+        estadoProducto.presentacionSeleccionada =
+            Presentacion.fromMap(value[0]);
+      } else {
+        estadoProducto.presentacionSeleccionada = Presentacion.defecto();
+      }
+    });
+
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    estadoProducto.marcaSeleccionada = MarcasGrupos.defecto();
-    estadoProducto.grupoSeleccionado = MarcasGrupos.defecto();
-
-    estadoProducto.comboSeleccionado = Combos.defecto();
     if (estadoProducto.controladores.isEmpty) {
       estadoProducto.controladores = [
         for (var i = 0; i < (estadoProducto.campos.length); i++)
@@ -51,6 +67,7 @@ class _CreacionProductosState extends State<CreacionProductos> {
           TextFormFieldProducto(index: i),
         );
       }
+      FocusScope.of(context).requestFocus(estadoProducto.focusNode[0]);
     }
 
     return Scaffold(
@@ -64,16 +81,25 @@ class _CreacionProductosState extends State<CreacionProductos> {
           child: (anchoPantalla(context).ancho < 600)
               ? ListView(
                   children: [
+                    const SizedBox(
+                      height: 8,
+                    ),
                     for (var i = 0;
                         i < estadoProducto.listadeTexfromFieldPrincipal.length;
                         i++)
                       estadoProducto.listadeTexfromFieldPrincipal[i],
                     // elevatedButtonGuardar(context),
-                    const BotonGuardar(),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 40.0),
+                      child: BotonGuardar(),
+                    ),
                   ],
                 )
               : ListView(
                   children: [
+                    const SizedBox(
+                      height: 8,
+                    ),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -101,14 +127,17 @@ class _CreacionProductosState extends State<CreacionProductos> {
                         )
                       ],
                     ),
-                    const BotonGuardar(),
-                    FloatingActionButton(
-                      onPressed: () {
-                        MarcaDB.getId(estadoProducto.marcaSeleccionada.id)
-                            .then((value) => print(value[0]["nombre"]));
-                      },
-                      child: const Icon(Icons.add),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 180),
+                      child: BotonGuardar(),
                     ),
+                    // FloatingActionButton(
+                    //   onPressed: () {
+                    //     MarcaDB.getId(estadoProducto.marcaSeleccionada.id)
+                    //         .then((value) => print(value[0]["nombre"]));
+                    //   },
+                    //   child: const Icon(Icons.add),
+                    // ),
                   ],
                 ),
         ),

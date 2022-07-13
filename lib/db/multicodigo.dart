@@ -1,8 +1,13 @@
 // ignore_for_file: avoid_print, null_argument_to_non_null_type, prefer_typing_uninitialized_variables
 
+import 'package:flutter_mongodb/db/productos_mongo.dart';
+import 'package:flutter_mongodb/estado_getx/multicodigo_getx.dart';
 import 'package:flutter_mongodb/modelos/multicodigo.dart';
 import 'package:flutter_mongodb/utilidades.dart';
+import 'package:get/get.dart';
 import 'package:mongo_dart/mongo_dart.dart';
+
+import '../funciones_generales/alertas_mensajes.dart';
 
 class MulticodigoDB {
   static var db, coleccion;
@@ -77,17 +82,32 @@ class MulticodigoDB {
 
   //comprobar si el nombre existe
   static Future<bool> existeNombre(Multicodigo nombre) async {
+    EstadoMulticodigos estado = Get.find<EstadoMulticodigos>();
     try {
-      final existe = await coleccion
-          .find(where
-              .eq("idProducto", nombre.idProducto)
-              .and(where.eq("codigo", nombre.codigo)))
-          .toList();
+      final existe =
+          await coleccion.find(where.eq("codigo", nombre.codigo)).toList();
       return (existe.isEmpty)
-          ? true
+          //si no esta en los multicodigos buscar en los productos
+          ? await ProductosDB.getcodigo(nombre.codigo).then((value) {
+              if (value != null) {
+                informarFlotante(
+                  context: estado.context,
+                  texto: "El código ${nombre.codigo} pertenece al producto",
+                  valor: value[0]['nombre'],
+                );
+              }
+              return (value == null);
+            })
           : (existe[0]['_id'] == nombre.id)
               ? true
-              : false;
+              : () {
+                  informarFlotante(
+                    context: estado.context,
+                    texto: "El código ${nombre.codigo} ya existe",
+                    valor: existe[0]['detalle'],
+                  );
+                  return false;
+                }();
     } catch (e) {
       print(e);
       return false;

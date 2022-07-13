@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mongodb/db/productos_mongo.dart';
 
 import 'package:flutter_mongodb/modelos/marcas.dart';
+import 'package:flutter_mongodb/modelos/productos.dart';
 import 'package:get/get.dart';
 
 import '../../db/grupos_mongo.dart';
 import '../../db/marcas_mongo.dart';
+import '../../db/presentacion.dart';
 import '../../db/tarifa_impuestos_mongo.dart';
 import '../../estado_getx/productos_getx.dart';
 import '../../funciones_generales/response.dart';
@@ -74,8 +76,14 @@ class _ListaSeleccionState extends State<ListaSeleccion> {
     if (widget.esProducto == true) {
       ProductosDB.getnombre(_letrasFiltro).then((value) {
         if (value != null) {
-          value.forEach((element) {
-            estadoProductos.marcasFiltradas.add(element);
+          value.forEach((element) async {
+            final marca = await MarcaDB.getId(element['marcaId']);
+            if (marca != null) {
+              Map<String, dynamic> producto =
+                  Productos.fromMap(element).toMap();
+              producto.addAll({"nombreMarca": marca[0]['nombre']});
+              estadoProductos.marcasFiltradas.add(producto);
+            }
           });
         }
       });
@@ -104,7 +112,18 @@ class _ListaSeleccionState extends State<ListaSeleccion> {
                         });
                       }
                     })
-                  : null;
+                  : widget.coleccion == "Presentacion"
+                      ? PresentacionDB.getParametro(_letrasFiltro)
+                          .then((value) {
+                          if (value != null) {
+                            value.forEach((element) {
+                              if (element["visible"]) {
+                                estadoProductos.marcasFiltradas.add(element);
+                              }
+                            });
+                          }
+                        })
+                      : null;
     }
   }
 
@@ -131,11 +150,18 @@ class _ListaSeleccionState extends State<ListaSeleccion> {
     ${medidas.alto * 0.6}""");
 
     return SizedBox(
-      width: 400,
-      //medidas.anchoLista,
+      width: medidas.anchoLista,
       height: medidas.alto * 0.7,
       child: Column(
         children: [
+          Text(
+            ' ${widget.coleccion}',
+            style: const TextStyle(
+              fontSize: 25,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 5),
           Row(
             children: [
               IconButton(

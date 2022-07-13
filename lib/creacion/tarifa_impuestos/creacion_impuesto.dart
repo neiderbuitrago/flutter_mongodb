@@ -28,6 +28,7 @@ class _CreacionImpuestosState extends State<CreacionImpuestos> {
           child: Column(
             children: [
               Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SizedBox(
                       width: MediaQuery.of(context).size.width * 0.49,

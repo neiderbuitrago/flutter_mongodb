@@ -80,6 +80,12 @@ class ListaMarcasGrupos extends StatelessWidget {
                                       estadoGrupos.controlador[0].clear();
                                       estadoGrupos.nuevoEditar.value = true;
                                     });
+                            } else {
+                              redibujarLista();
+                              estadoGrupos.controlador[0].clear();
+                              estadoGrupos.nuevoEditar.value = true;
+                              estadoMarcas.controlador[0].clear();
+                              estadoMarcas.nuevoEditar.value = true;
                             }
                           });
                         },

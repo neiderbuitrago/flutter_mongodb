@@ -2,14 +2,15 @@
 
 import 'package:flutter_mongodb/creacion/productos/limpiar_form_productos.dart';
 import 'package:flutter_mongodb/creacion/venta_x_cantidad/widget.dart';
-import 'package:flutter_mongodb/db/combo.dart';
 import 'package:flutter_mongodb/db/marcas_mongo.dart';
+import 'package:flutter_mongodb/db/presentacion.dart';
 import 'package:flutter_mongodb/db/productos_mongo.dart';
 import 'package:flutter_mongodb/db/venta_x_cantida_mongo.dart';
-import 'package:flutter_mongodb/modelos/combo.dart';
 import 'package:flutter_mongodb/modelos/fracciones.dart';
+
 import 'package:get/get.dart';
 import 'package:mongo_dart/mongo_dart.dart';
+import '../../db/combo.dart';
 import '../../db/fracciones.dart';
 import '../../db/grupos_mongo.dart';
 import '../../db/tarifa_impuestos_mongo.dart';
@@ -17,6 +18,7 @@ import '../../estado_getx/fracciones_getx.dart';
 import '../../estado_getx/productos_getx.dart';
 import '../../estado_getx/venta_x_cantidad_getx.dart';
 import '../../funciones_generales/numeros.dart';
+import '../../modelos/combo.dart';
 import '../../modelos/productos.dart';
 import '../../modelos/venta_x_cantidad.dart';
 
@@ -35,42 +37,53 @@ llenarDatos({
               estadoProducto.productoConsultado = producto,
               estadoProducto.nuevoEditar.value = false,
               estadoProducto.controladores[0].text = producto.codigo,
-
               controladores[1].text = producto.nombre,
               MarcaDB.getId(producto.marcaId).then((value1) {
                 if (value1 != null) {
                   estadoProducto.guardarIdMarcaGrupoImpuesto(
                       index: 2, value: value1[0]);
+                } else {
+                  estadoProducto.controladores[2].text = '';
                 }
               }),
               GruposDB.getId(producto.grupoId).then((value1) {
                 if (value1 != null) {
                   estadoProducto.guardarIdMarcaGrupoImpuesto(
                       index: 3, value: value1[0]);
+                } else {
+                  estadoProducto.controladores[3].text = '';
                 }
               }),
               TarifaImpuestosDB.getId(producto.impuestoId).then((value1) {
                 if (value1 != null) {
                   estadoProducto.guardarIdMarcaGrupoImpuesto(
                       index: 4, value: value1[0]);
+                } else {
+                  estadoProducto.controladores[3].text = '';
                 }
               }),
-              controladores[5].text = producto.precioCompra.toString(),
-              controladores[6].text = producto.cantidad.toString(),
-              controladores[7].text = producto.bodega1.toString(),
-              controladores[8].text = producto.bodega2.toString(),
-              controladores[9].text = producto.bodega3.toString(),
-              controladores[10].text = producto.bodega4.toString(),
-              controladores[11].text = producto.bodega5.toString(),
-              controladores[12].text = producto.precioVenta1.toString(),
-              controladores[13].text = producto.precioVenta2.toString(),
-              controladores[14].text = producto.precioVenta3.toString(),
-              controladores[15].text = producto.cantidadMinima.toString(),
-              controladores[16].text = producto.cantidadMaxima.toString(),
-              controladores[17].text = producto.presentacionId.toString(),
-              controladores[18].text = producto.comision.toString(),
-              controladores[19].text = producto.descuentoPorcentaje.toString(),
-              controladores[20].text = producto.descuentoValor.toString(),
+              controladores[5].text = quitarDecimales(producto.precioCompra),
+              controladores[6].text = quitarDecimales(producto.cantidad),
+              controladores[7].text = quitarDecimales(producto.bodega1),
+              controladores[8].text = quitarDecimales(producto.bodega2),
+              controladores[9].text = quitarDecimales(producto.bodega3),
+              controladores[10].text = quitarDecimales(producto.bodega4),
+              controladores[11].text = quitarDecimales(producto.bodega5),
+              controladores[12].text = quitarDecimales(producto.precioVenta1),
+              controladores[13].text = quitarDecimales(producto.precioVenta2),
+              controladores[14].text = quitarDecimales(producto.precioVenta3),
+              controladores[15].text = quitarDecimales(producto.cantidadMinima),
+              controladores[16].text = quitarDecimales(producto.cantidadMaxima),
+              PresentacionDB.getId(producto.presentacionId).then((value1) {
+                if (value1 != null) {
+                  estadoProducto.guardarIdPresentacion(
+                      index: 17, value: value1[0]);
+                }
+              }),
+              controladores[18].text = quitarDecimales(producto.comision),
+              controladores[19].text =
+                  quitarDecimales(producto.descuentoPorcentaje),
+              controladores[20].text = quitarDecimales(producto.descuentoValor),
               controladores[21].text = producto.ubicacion.toString(),
               estadoProducto.manejaVentaFraccionada.value =
                   producto.manejaFracciones,
@@ -79,20 +92,15 @@ llenarDatos({
               estadoProducto.manejaIdentificador.value =
                   producto.manejaIdentificador,
               estadoProducto.manejaCombos.value = producto.manejaCombo,
-              // ComboDB.getId(producto.comboId).then((value1) {
-              //   if (value1 != null) {
-              //     estadoProducto.comboSeleccionado = Combos.fromMap(value1[0]);
-              //     estadoProducto.nombreComboSeleccionado.value =
-              //         value1[0]['nombre'];
-
-              //     estadoProducto.nuevoEditar.value = false;
-              //   } else {
-              //     estadoProducto.nombreComboSeleccionado.value = '';
-              //     estadoProducto.comboSeleccionado = Combos.defecto();
-              //   }
-              // }),
-
-              //
+              ComboDB.getId(producto.comboId).then((value1) {
+                if (value1 != null) {
+                  estadoProducto.comboSeleccionado = value1;
+                  estadoProducto.nombreComboSeleccionado.value = value1.nombre;
+                } else {
+                  estadoProducto.nombreComboSeleccionado.value = '';
+                  estadoProducto.comboSeleccionado = Combos.defecto();
+                }
+              }),
               estadoProducto.manejaMulticodigos.value =
                   producto.manejaMulticodigo,
               estadoProducto.manejaVentaXPeso.value = producto.pesado,

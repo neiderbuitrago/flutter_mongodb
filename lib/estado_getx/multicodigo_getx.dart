@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, prefer_typing_uninitialized_variables
 
 import 'package:flutter/material.dart';
 import 'package:flutter_mongodb/estado_getx/productos_getx.dart';
@@ -10,9 +10,9 @@ import '../db/multicodigo.dart';
 import '../modelos/multicodigo.dart';
 
 class EstadoMulticodigos extends GetxController {
+  var context;
   var nuevoEditar = true;
   var nombreProducto = ''.obs;
-  // ObjectId idProducto = {}.obs as ObjectId;
 
   late Multicodigo multicodigo = {}.obs as Multicodigo;
 

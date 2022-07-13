@@ -18,6 +18,7 @@ textFormFieldGeneral({
   required bool esMarca,
   required List<FocusNode> focusNode,
 }) {
+  FocusScope.of(context).requestFocus(focusNode[0]);
   EstadoGrupos estadoGrupos = Get.put(EstadoGrupos());
   EstadoMarcas estadoMarcas = Get.put(EstadoMarcas());
 
