@@ -80,6 +80,18 @@ class MulticodigoDB {
     }
   }
 
+  static Future getCodigo(String valor) async {
+    try {
+      List existe = await coleccion
+          .find(where.eq('codigo', valor.toUpperCase()))
+          .toList();
+      return existe.isEmpty ? null : existe;
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
+
   //comprobar si el nombre existe
   static Future<bool> existeNombre(Multicodigo nombre) async {
     EstadoMulticodigos estado = Get.find<EstadoMulticodigos>();

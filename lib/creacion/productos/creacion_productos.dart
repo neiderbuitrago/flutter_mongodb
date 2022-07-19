@@ -46,7 +46,6 @@ class _CreacionProductosState extends State<CreacionProductos> {
       }
     });
 
-    // TODO: implement initState
     super.initState();
   }
 

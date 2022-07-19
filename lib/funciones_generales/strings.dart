@@ -8,3 +8,19 @@ campoEnMayusculas({required TextEditingController controller}) {
     controller.value = controller.value.copyWith(text: text);
   });
 }
+
+Divider lineaDivisora() {
+  return const Divider(
+    height: 1,
+    color: Colors.black54,
+  );
+}
+
+//consultar si un string esta en la lista de strings
+bool existe(String elemento, List lista) {
+  for (String value in lista) {
+    if (value == elemento) return true;
+    break;
+  }
+  return false;
+}

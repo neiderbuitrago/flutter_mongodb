@@ -28,3 +28,8 @@ puntosDeMil(String value) {
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (match) => '${match[1]}.');
   return result.toString();
 }
+
+indicerevez(int indice, int longitud) {
+  int resultado = (longitud - 1) - indice;
+  return resultado;
+}

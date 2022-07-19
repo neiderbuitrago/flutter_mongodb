@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_mongodb/db/productos_mongo.dart';
-
 import 'package:flutter_mongodb/modelos/marcas.dart';
 import 'package:flutter_mongodb/modelos/productos.dart';
 import 'package:get/get.dart';
@@ -21,6 +20,7 @@ Future<dynamic> listaFlotanteConsulta({
   int? index,
   bool? esProducto = false,
   String? letrasparaBuscar = '',
+  final TextEditingController? controladorBuscar,
 }) {
   print('letras para buscar: $letrasparaBuscar');
   return showDialog(
@@ -39,6 +39,7 @@ Future<dynamic> listaFlotanteConsulta({
               index: index,
               esProducto: esProducto,
               letrasparaBuscar: letrasparaBuscar,
+              controladorBuscar: controladorBuscar,
             ),
           ),
         );
@@ -52,18 +53,22 @@ class ListaSeleccion extends StatefulWidget {
     this.index,
     this.esProducto,
     this.letrasparaBuscar,
+    this.controladorBuscar,
   }) : super(key: key);
 
   final String coleccion;
   final int? index;
   final bool? esProducto;
   final String? letrasparaBuscar;
+  final TextEditingController? controladorBuscar;
 
   @override
   State<ListaSeleccion> createState() => _ListaSeleccionState();
 }
 
 class _ListaSeleccionState extends State<ListaSeleccion> {
+  TextEditingController controladorEncFiltro = TextEditingController();
+
   EstadoProducto estadoProductos = Get.find<EstadoProducto>();
   String _letrasFiltro = '';
   bool llenarDatoTraido = true;
@@ -130,6 +135,7 @@ class _ListaSeleccionState extends State<ListaSeleccion> {
   @override
   initState() {
     super.initState();
+    controladorEncFiltro.value.copyWith(text: widget.letrasparaBuscar);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // executes after build
     });
@@ -174,6 +180,7 @@ class _ListaSeleccionState extends State<ListaSeleccion> {
                 width: medidas.anchoLista - 100,
                 child: TextField(
                   autofocus: true,
+                  controller: widget.controladorBuscar ?? controladorEncFiltro,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),

@@ -46,6 +46,17 @@ class ProductosDB {
     }
   }
 
+  //consultar por el id del producto
+  static Future getId(ObjectId id) async {
+    try {
+      List datos = await coleccionProductos.find(where.id(id)).toList();
+      return (datos.isEmpty) ? null : datos;
+    } catch (e) {
+      print("error al consultar el Id del producto $e");
+      return Future.value();
+    }
+  }
+
 //consultar todos los codigos de barras
   static Future getcodigoAll() async {
     try {
@@ -131,12 +142,7 @@ class ProductosDB {
           : (existe[0]["_id"] == nombre.id)
               ? false
               : true;
-      // resultado = existe
-      //     .map((e) {
-      //       return e["_id"] != nombre.id;
-      //     })
-      //     .toList()
-      //     .contains(true);
+
       print("producto existe $resultado");
       return resultado;
     } catch (e) {

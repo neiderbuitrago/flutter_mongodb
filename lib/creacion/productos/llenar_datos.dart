@@ -119,30 +119,28 @@ llenarDatos({
 llenarFracciones(ObjectId id) {
   EstadoVentaFraccionada estadoFracciones = Get.find<EstadoVentaFraccionada>();
   List controlador = estadoFracciones.controladoresFraccion;
-  FraccionesDB.getId(id).then((value1) {
+  FraccionesDB.getIdPadre(id).then((value1) {
     if (value1 != null) {
-      var fraccion = Fracciones.fromMap(value1[0]);
-      estadoFracciones.fraccionesConsultadas = fraccion;
+      List<Fracciones> lista = value1.forEach((element) {
+        (Fracciones.fromMap(element));
+      }).toList();
+
       estadoFracciones.nuevoEditar.value = false;
-      controlador[0].text = enBlancoSiEsCero(fraccion.cantidadXEmpaque);
-      controlador[1].text = fraccion.nombre1;
-      controlador[2].text = enBlancoSiEsCero(fraccion.cantidadDescontar1);
-      controlador[3].text = enBlancoSiEsCero(fraccion.precio1);
-      controlador[5].text = fraccion.nombre2;
-      controlador[6].text = enBlancoSiEsCero(fraccion.cantidadDescontar2);
-      controlador[7].text = enBlancoSiEsCero(fraccion.precio2);
-      controlador[9].text = fraccion.nombre3;
-      controlador[10].text = enBlancoSiEsCero(fraccion.cantidadDescontar3);
-      controlador[11].text = enBlancoSiEsCero(fraccion.precio3);
-      controlador[13].text = fraccion.nombre4;
-      controlador[14].text = enBlancoSiEsCero(fraccion.cantidadDescontar4);
-      controlador[15].text = enBlancoSiEsCero(fraccion.precio4);
-      controlador[17].text = enBlancoSiEsCero(fraccion.cantidad);
-      controlador[18].text = enBlancoSiEsCero(fraccion.bodega1);
-      controlador[19].text = enBlancoSiEsCero(fraccion.bodega2);
-      controlador[20].text = enBlancoSiEsCero(fraccion.bodega3);
-      controlador[21].text = enBlancoSiEsCero(fraccion.bodega4);
-      controlador[22].text = enBlancoSiEsCero(fraccion.bodega5);
+      controlador[0].text = lista[0].cantidadXEmpaque.toString();
+      controlador[11].text = enBlancoSiEsCero(lista[0].cantidad);
+      controlador[6].text = enBlancoSiEsCero(lista[0].bodega1);
+      controlador[7].text = enBlancoSiEsCero(lista[0].bodega2);
+      controlador[8].text = enBlancoSiEsCero(lista[0].bodega3);
+      controlador[9].text = enBlancoSiEsCero(lista[0].bodega4);
+      controlador[10].text = enBlancoSiEsCero(lista[0].bodega5);
+      for (int i = 0; i < lista.length; i++) {
+        if (i == 0) {
+          controlador[1].text = lista[i].codigo;
+          controlador[2].text = lista[i].nombre;
+          controlador[3].text = lista[i].cantidadDescontar.toString();
+          controlador[4].text = lista[i].precio.toString();
+        }
+      }
       estadoFracciones.calcularGanancias();
     } else {
       for (var element in controlador) {

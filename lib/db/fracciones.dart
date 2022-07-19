@@ -14,15 +14,13 @@ class FraccionesDB {
     coleccion = await db.collection("fracciones");
   }
 
-  static Future getParametro(String letras) async {
+  static Future getCodigo(String codigo) async {
     try {
-      var datos = await coleccion
-          .find(where
-              .match("nombre", letras, caseInsensitive: true)
-              .sortBy("nombre", descending: false))
+      List datos = await coleccion
+          .find(where.eq("codigo", codigo.toUpperCase()))
           .toList();
 
-      return datos;
+      return (datos.isNotEmpty) ? datos : null;
     } catch (e) {
       print(e);
       return Future.value();
@@ -32,6 +30,17 @@ class FraccionesDB {
   static Future getId(ObjectId id) async {
     try {
       List datos = await coleccion.find(where.id(id)).toList();
+      if (datos.isEmpty) return null;
+      return datos;
+    } catch (e) {
+      print(e);
+      return Future.value();
+    }
+  }
+
+  static Future getIdPadre(ObjectId id) async {
+    try {
+      List datos = await coleccion.find(where.eq("idPadre", id)).toList();
       if (datos.isEmpty) return null;
       return datos;
     } catch (e) {

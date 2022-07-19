@@ -5,6 +5,8 @@ import 'package:flutter_mongodb/db/productos_mongo.dart';
 
 import 'package:get/get.dart';
 
+import '../funciones_generales/alertas_mensajes.dart';
+
 Future<int> nuevoCodigostring() async {
   int codigo = 1;
   var codigos = await ProductosDB.getcodigoAll();
@@ -141,38 +143,4 @@ class InformeFlotanteInferior extends StatelessWidget {
         content:
             informarInferior(titleText: titleText, messageText: messageText));
   }
-}
-
-informarInferior({required String titleText, required String messageText}) {
-  Get.snackbar(
-    '',
-    '',
-    titleText: Text(
-      titleText,
-      style: const TextStyle(color: Colors.black, fontSize: 20),
-    ),
-    messageText: Text(
-      messageText,
-      style: const TextStyle(
-          color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
-    ),
-    icon: const Icon(Icons.error),
-    backgroundColor: const Color.fromARGB(255, 185, 243, 253),
-    colorText: Colors.black,
-    borderRadius: 20,
-    snackPosition: SnackPosition.BOTTOM,
-    margin: const EdgeInsets.all(100),
-    duration: const Duration(seconds: 2),
-    borderColor: Colors.black,
-    borderWidth: 1,
-    forwardAnimationCurve: Curves.easeInOutCubicEmphasized,
-    boxShadows: [
-      BoxShadow(
-        blurRadius: 20,
-        // spreadRadius: 5.0,
-        offset: const Offset(0, 48),
-        color: Colors.black.withOpacity(0.2),
-      ),
-    ],
-  );
 }

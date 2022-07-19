@@ -13,11 +13,10 @@ import '../../modelos/fracciones.dart';
 class TexfieldFracciones extends StatefulWidget {
   const TexfieldFracciones({
     Key? key,
-    required this.focofracciones,
     required this.labelText,
     required this.index,
   }) : super(key: key);
-  final List<FocusNode> focofracciones;
+
   final String labelText;
   final int index;
 
@@ -30,12 +29,8 @@ class _TexfieldFraccionesState extends State<TexfieldFracciones> {
       Get.find<EstadoVentaFraccionada>();
   @override
   Widget build(BuildContext context) {
-    //Agregar un oyente a los siguientes controladores
-    // para colocar su contenido en mayuscualas
-    bool stringDouble = (widget.index == 1 ||
-        widget.index == 5 ||
-        widget.index == 9 ||
-        widget.index == 13);
+    int index = widget.index;
+    bool stringDouble = (index == 2 || index == 3);
     if (stringDouble) {
       campoEnMayusculas(
           controller:
@@ -57,7 +52,7 @@ class _TexfieldFraccionesState extends State<TexfieldFracciones> {
         ),
         child: TextField(
             autofocus: (widget.index == 0) ? true : false,
-            focusNode: widget.focofracciones[widget.index],
+            focusNode: estadoVentaFraccionada.focofracciones[widget.index],
             controller:
                 estadoVentaFraccionada.controladoresFraccion[widget.index],
             decoration: InputDecoration(
@@ -76,63 +71,41 @@ class _TexfieldFraccionesState extends State<TexfieldFracciones> {
             inputFormatters: (!stringDouble)
                 ? [FilteringTextInputFormatter.allow(RegExp('[0-9-.]'))]
                 : [],
-            onChanged: (widget.index == 3 ||
-                    widget.index == 7 ||
-                    widget.index == 11 ||
-                    widget.index == 15)
+            onChanged: (widget.index == 5)
                 ? (value) {
                     estadoVentaFraccionada.calcularGanancias();
                   }
-                : (widget.index == 4 ||
-                        widget.index == 8 ||
-                        widget.index == 12 ||
-                        widget.index == 16)
+                : (widget.index == 6)
                     ? (value) {
-                        double pc = numeroDecimal(
-                            estadoVentaFraccionada.costoGeneralProducto.value);
-
-                        double cxe = numeroDecimal(estadoVentaFraccionada
-                            .controladoresFraccion[0].text);
-                        double cantidadDescontar = numeroDecimal(
-                            estadoVentaFraccionada
-                                .controladoresFraccion[widget.index - 2].text);
-
-                        double costoFraccion = (pc / cxe) * cantidadDescontar;
-
-                        int precioVenta =
-                            ((costoFraccion * numeroDecimal(value)) / 100 +
-                                    costoFraccion)
-                                .toInt();
-
-                        estadoVentaFraccionada
-                            .controladoresFraccion[widget.index - 1]
-                            .text = (precioVenta.round()).toString();
+                        estadoVentaFraccionada.calcularPrecioVenta(
+                            index: widget.index, value: value);
                       }
                     : (value) {
                         print('cambios en el texto10  $value $widget.index');
                       },
             onSubmitted: (value) {
+              if (widget.index == 2) {
+                estadoVentaFraccionada.consultarSiCodigoFraccionExiste(
+                    value, context);
+              }
+
               if (widget.index == 0) {
-                FocusScope.of(context)
-                    .requestFocus(widget.focofracciones[widget.index + 17]);
-              } else if (widget.index == 17 &&
+                FocusScope.of(context).requestFocus(
+                    estadoVentaFraccionada.focofracciones[widget.index + 1]);
+              } else if (widget.index == 1 &&
                   estadoVentaFraccionada.listaBodegasVisibles.value) {
                 FocusScope.of(context)
-                    .requestFocus(widget.focofracciones[widget.index + 1]);
-              } else if (widget.index == 17 &&
-                  !estadoVentaFraccionada.listaBodegasVisibles.value) {
-                printError(info: 'Pasando el foco a el 1');
-                FocusScope.of(context).requestFocus(widget.focofracciones[1]);
-              } else if (widget.index == 18) {
+                    .requestFocus(estadoVentaFraccionada.focofracciones[7]);
+              } else if (widget.index == 11 &&
+                  estadoVentaFraccionada.listaBodegasVisibles.value) {
                 FocusScope.of(context)
-                    .requestFocus(widget.focofracciones[widget.index + 1]);
-              } else if (widget.index == 22) {
-                FocusScope.of(context).requestFocus(widget.focofracciones[1]);
-              } else if (widget.index == 16) {
-                FocusScope.of(context).requestFocus(widget.focofracciones[0]);
+                    .requestFocus(estadoVentaFraccionada.focofracciones[2]);
+              } else if (widget.index == 6) {
+                FocusScope.of(context)
+                    .requestFocus(estadoVentaFraccionada.focofracciones[12]);
               } else {
-                FocusScope.of(context)
-                    .requestFocus(widget.focofracciones[widget.index + 1]);
+                FocusScope.of(context).requestFocus(
+                    estadoVentaFraccionada.focofracciones[widget.index + 1]);
               }
             },
             onTap: () {
@@ -155,7 +128,7 @@ class Cardgeneral extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 250,
+      height: 300,
       width: 300,
       child: Card(
         shadowColor: colorbordes,
@@ -179,119 +152,54 @@ class Cardgeneral extends StatelessWidget {
   }
 }
 
-class CantidadesBodega1 extends StatelessWidget {
-  const CantidadesBodega1({
-    Key? key,
-    required this.focofracciones,
-    required this.medidas,
-  }) : super(key: key);
-  final List<FocusNode> focofracciones;
-  final AnchoDePantalla medidas;
+Widget cantidadFracciones({
+  required AnchoDePantalla medidas,
+}) {
+  late EstadoVentaFraccionada estadoVentaFraccionada =
+      Get.find<EstadoVentaFraccionada>();
 
-  @override
-  Widget build(BuildContext context) {
-    late EstadoVentaFraccionada estadoVentaFraccionada =
-        Get.find<EstadoVentaFraccionada>();
-    List<String> nombres = [
-      'Cantidad',
-      'Bodega1',
-      'Bodega2',
-      'Bodega3',
-      'Bodega4',
-      'Bodega5',
-    ];
-
-    return SizedBox(
-      width: medidas.anchoLista,
-      child: Wrap(
-        alignment: WrapAlignment.center,
-        children: [
-          for (var i = 0; i < nombres.length; i++)
-            SizedBox(
-              child: (i == 0)
-                  ? Obx(
-                      () => SizedBox(
-                        width:
-                            (estadoVentaFraccionada.listaBodegasVisibles.value)
-                                ? 300
-                                : medidas.anchoLista,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              width: 250,
-                              child: TexfieldFracciones(
-                                focofracciones: focofracciones,
-                                labelText: nombres[i],
-                                index: i + 17,
-                              ),
-                            ),
-                            Obx(
-                              () => IconButton(
-                                  icon: Icon(
-                                      (estadoVentaFraccionada
-                                              .listaBodegasVisibles.value)
-                                          ? Icons.playlist_remove
-                                          : Icons.playlist_add,
-                                      size: 40),
-                                  onPressed: () {
-                                    estadoVentaFraccionada
-                                            .listaBodegasVisibles.value =
-                                        !estadoVentaFraccionada
-                                            .listaBodegasVisibles.value;
-                                  }),
-                            ),
-                          ],
-                        ),
-                      ),
-                    )
-                  : Obx(
-                      () => Visibility(
-                        visible:
-                            estadoVentaFraccionada.listaBodegasVisibles.value,
-                        child: SizedBox(
-                          width: 300,
-                          child: TexfieldFracciones(
-                            focofracciones: focofracciones,
-                            labelText: nombres[i],
-                            index: i + 17,
-                          ),
-                        ),
-                      ),
-                    ),
+  return SizedBox(
+    child: Obx(
+      () => SizedBox(
+        width: (estadoVentaFraccionada.listaBodegasVisibles.value)
+            ? 300
+            : medidas.anchoLista,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SizedBox(
+              width: 250,
+              child: TexfieldFracciones(
+                labelText: "Cantidad",
+                index: 1,
+              ),
             ),
-        ],
+            Obx(
+              () => IconButton(
+                  icon: Icon(
+                      (estadoVentaFraccionada.listaBodegasVisibles.value)
+                          ? Icons.playlist_remove
+                          : Icons.playlist_add,
+                      size: 40),
+                  onPressed: () {
+                    estadoVentaFraccionada.listaBodegasVisibles.value =
+                        !estadoVentaFraccionada.listaBodegasVisibles.value;
+                  }),
+            ),
+          ],
+        ),
       ),
-    );
-  }
+    ),
+  );
 }
 
 llanarDatosfracciones() {
   EstadoVentaFraccionada estadoFracciones = Get.find<EstadoVentaFraccionada>();
-
   Fracciones fracciones = estadoFracciones.fraccionesConsultadas;
   List controlador = estadoFracciones.controladoresFraccion;
-  estadoFracciones.controladoresFraccion[0].text =
-      enBlancoSiEsCero(fracciones.cantidad).toString();
-
-  controlador[1].text = fracciones.nombre1;
-  controlador[2].text = enBlancoSiEsCero(fracciones.cantidadDescontar1);
-  controlador[3].text = enBlancoSiEsCero(fracciones.precio1);
-  //
-  controlador[5].text = fracciones.nombre2;
-  controlador[6].text = enBlancoSiEsCero(fracciones.cantidadDescontar2);
-  controlador[7].text = enBlancoSiEsCero(fracciones.precio2);
-  //
-  controlador[9].text = fracciones.nombre3;
-  controlador[10].text = enBlancoSiEsCero(fracciones.cantidadDescontar3);
-  controlador[11].text = enBlancoSiEsCero(fracciones.precio3);
-  //
-  controlador[13].text = fracciones.nombre4;
-  controlador[14].text = enBlancoSiEsCero(fracciones.cantidadDescontar4);
-  controlador[15].text = enBlancoSiEsCero(fracciones.precio4);
-  //
+  controlador[0].text = enBlancoSiEsCero(fracciones.cantidad).toString();
+  controlador[1].text = fracciones.nombre;
   controlador[17].text = enBlancoSiEsCero(fracciones.cantidad);
-
   controlador[18].text = enBlancoSiEsCero(fracciones.bodega1);
   controlador[19].text = enBlancoSiEsCero(fracciones.bodega2);
   controlador[20].text = enBlancoSiEsCero(fracciones.bodega3);

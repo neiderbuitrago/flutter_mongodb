@@ -52,16 +52,6 @@ void limpiarTextos({required int index}) {
   }
 }
 
-limpiarFracciones() {
-  EstadoVentaFraccionada estadoFracciones = Get.find<EstadoVentaFraccionada>();
-  EstadoProducto estadoProducto = Get.find<EstadoProducto>();
-  estadoFracciones.nuevoEditar.value = true;
-  for (var element in estadoFracciones.controladoresFraccion) {
-    element.clear();
-  }
-  estadoProducto.manejaVentaFraccionada.value = false;
-}
-
 limpiarVentaXCantidad() {
   EstadoVentaXCantidad estado = Get.find<EstadoVentaXCantidad>();
   EstadoProducto estadoProducto = Get.find<EstadoProducto>();

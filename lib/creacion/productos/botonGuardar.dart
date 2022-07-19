@@ -11,6 +11,7 @@ import '../../estado_getx/fracciones_getx.dart';
 import '../../estado_getx/productos_getx.dart';
 
 import '../../estado_getx/venta_x_cantidad_getx.dart';
+import '../../funciones_generales/alertas_mensajes.dart';
 import '../../funciones_generales/numeros.dart';
 import '../../modelos/fracciones.dart';
 import '../../modelos/productos.dart';
@@ -121,57 +122,6 @@ class BotonGuardar extends StatelessWidget {
                 });
 
           //fracciones
-
-          if (estadoProducto.manejaVentaFraccionada.value) {
-            EstadoVentaFraccionada estadoFracciones =
-                Get.find<EstadoVentaFraccionada>();
-            Fracciones fracciones = Fracciones(
-              id: productoAGuardar.id,
-              cantidadXEmpaque:
-                  numeroDecimal(estadoFracciones.controladoresFraccion[0].text),
-              codigo1: '0',
-              nombre1: estadoFracciones.controladoresFraccion[1].text,
-              cantidadDescontar1:
-                  numeroDecimal(estadoFracciones.controladoresFraccion[2].text),
-              precio1:
-                  numeroDecimal(estadoFracciones.controladoresFraccion[3].text),
-              codigo2: '0',
-              nombre2: estadoFracciones.controladoresFraccion[5].text,
-              cantidadDescontar2:
-                  numeroDecimal(estadoFracciones.controladoresFraccion[6].text),
-              precio2:
-                  numeroDecimal(estadoFracciones.controladoresFraccion[7].text),
-              codigo3: '0',
-              nombre3: estadoFracciones.controladoresFraccion[9].text,
-              cantidadDescontar3: numeroDecimal(
-                  estadoFracciones.controladoresFraccion[10].text),
-              precio3: numeroDecimal(
-                  estadoFracciones.controladoresFraccion[11].text),
-              codigo4: '0',
-              nombre4: estadoFracciones.controladoresFraccion[13].text,
-              cantidadDescontar4: numeroDecimal(
-                  estadoFracciones.controladoresFraccion[14].text),
-              precio4: numeroDecimal(
-                  estadoFracciones.controladoresFraccion[15].text),
-              cantidad: numeroDecimal(
-                  estadoFracciones.controladoresFraccion[17].text),
-              bodega1: numeroDecimal(
-                  estadoFracciones.controladoresFraccion[18].text),
-              bodega2: numeroDecimal(
-                  estadoFracciones.controladoresFraccion[19].text),
-              bodega3: numeroDecimal(
-                  estadoFracciones.controladoresFraccion[20].text),
-              bodega4: numeroDecimal(
-                  estadoFracciones.controladoresFraccion[21].text),
-              bodega5: numeroDecimal(
-                  estadoFracciones.controladoresFraccion[22].text),
-            );
-            estadoFracciones.nuevoEditar.value
-                ? await FraccionesDB.insertar(fracciones)
-                    .then((value) => limpiarFracciones())
-                : await FraccionesDB.actualizar(fracciones)
-                    .then((value) => limpiarFracciones());
-          }
 
           // VentasXCantidad
 

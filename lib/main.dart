@@ -7,6 +7,7 @@ import 'package:flutter_mongodb/db/identificadores.dart';
 import 'package:flutter_mongodb/db/multicodigo.dart';
 import 'package:flutter_mongodb/estado_getx/marcas_getx.dart';
 import 'package:flutter_mongodb/estado_getx/productos_getx.dart';
+import 'package:flutter_mongodb/ventas/ventas.dart';
 import 'package:get/get.dart';
 import 'creacion/grupos/creacion_grupos.dart';
 import 'creacion/marcas/creacion_marca.dart';
@@ -87,6 +88,7 @@ class _MyAppState extends State<MyApp> {
     const CreacionGrupo(),
     const CreacionImpuestos(),
     const CreacionPresentacion(),
+    const Ventas(),
   ];
 
   @override
@@ -123,6 +125,10 @@ class _MyAppState extends State<MyApp> {
             BottomNavigationBarItem(
               icon: Icon(Icons.auto_awesome_mosaic_outlined),
               label: 'Presentaciones',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.multiline_chart_outlined),
+              label: 'Ventas',
             ),
           ],
           currentIndex: _selectedIndex,

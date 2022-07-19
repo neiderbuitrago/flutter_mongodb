@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 
 class AnchoDePantalla {
@@ -33,4 +35,43 @@ anchoPantalla(context) {
                 : 750,
   );
   return anchoDePantalla;
+}
+
+tamanoIconos(context) {
+  double tamano = (anchoPantalla(context).ancho * 0.045);
+
+  return (tamano > 56)
+      ? 56.0
+      : (tamano < 21)
+          ? 21.0
+          : tamano;
+}
+
+tamanoletraMediano(context) {
+  double tamano = (anchoPantalla(context).ancho * 0.02);
+  print(tamano);
+  return (tamano > 30.0)
+      ? 30.0
+      : (tamano < 19.5)
+          ? 19.5
+          : tamano;
+}
+
+tamanoletraPequeno(context) {
+  double tamano = (anchoPantalla(context).ancho * 0.01);
+
+  return (tamano > 15.3)
+      ? 15.3
+      : (tamano < 11.0)
+          ? 11.0
+          : tamano;
+}
+
+altoencabezadoVentas(context) {
+  double alto = (anchoPantalla(context).ancho * 0.04) + (100);
+  return (alto > 170)
+      ? 170.0
+      : (alto < 100)
+          ? 100.0
+          : alto;
 }
