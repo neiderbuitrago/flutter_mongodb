@@ -1,3 +1,4 @@
+import 'package:flutter_mongodb/modelos/fracciones.dart';
 import 'package:flutter_mongodb/modelos/productos.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
@@ -13,7 +14,7 @@ class ProductosEnVenta {
   late double impuesto;
   late bool ventaDeFracciones;
   int? productosAgregados = 0;
-  Map<String, dynamic>? fracciones = {};
+  late FraccionesEnVenta? fracciones;
 
   ProductosEnVenta({
     required this.id,

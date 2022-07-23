@@ -40,7 +40,7 @@ class FraccionesDB {
 
   static Future getIdPadre(ObjectId id) async {
     try {
-      List datos = await coleccion.find(where.eq("idPadre", id)).toList();
+      List datos = await coleccion.find(where.eq("idProducto", id)).toList();
       if (datos.isEmpty) return null;
       return datos;
     } catch (e) {
@@ -69,11 +69,13 @@ class FraccionesDB {
     }
   }
 
-  static Future<void> eliminar(Fracciones value) async {
+  static Future<void> eliminar(ObjectId id) async {
     try {
       await coleccion.remove(
-        where.eq('_id', value.id),
+        where.eq('_id', id),
       );
+      //mostrar alerta inferior  de eliminado
+
     } catch (e) {
       print(e);
     }

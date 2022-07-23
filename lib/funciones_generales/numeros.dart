@@ -23,7 +23,7 @@ String enBlancoSiEsCero(double valor) {
   return (valor == 0) ? "" : resultado.toString();
 }
 
-puntosDeMil(String value) {
+String puntosDeMil(String value) {
   String result = value.replaceAllMapped(
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (match) => '${match[1]}.');
   return result.toString();

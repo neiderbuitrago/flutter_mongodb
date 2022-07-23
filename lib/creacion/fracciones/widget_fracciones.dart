@@ -5,10 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../../estado_getx/fracciones_getx.dart';
-import '../../funciones_generales/numeros.dart';
 import '../../funciones_generales/response.dart';
 import '../../funciones_generales/strings.dart';
-import '../../modelos/fracciones.dart';
 
 class TexfieldFracciones extends StatefulWidget {
   const TexfieldFracciones({
@@ -175,12 +173,14 @@ Widget cantidadFracciones({
               ),
             ),
             Obx(
-              () => IconButton(
-                  icon: Icon(
-                      (estadoVentaFraccionada.listaBodegasVisibles.value)
-                          ? Icons.playlist_remove
-                          : Icons.playlist_add,
-                      size: 40),
+              () => FloatingActionButton(
+                  backgroundColor: Colors.white,
+                  child: Icon(
+                    (estadoVentaFraccionada.listaBodegasVisibles.value)
+                        ? Icons.playlist_remove
+                        : Icons.playlist_add,
+                    size: tamanoIconos(estadoVentaFraccionada.context),
+                  ),
                   onPressed: () {
                     estadoVentaFraccionada.listaBodegasVisibles.value =
                         !estadoVentaFraccionada.listaBodegasVisibles.value;
@@ -191,18 +191,4 @@ Widget cantidadFracciones({
       ),
     ),
   );
-}
-
-llanarDatosfracciones() {
-  EstadoVentaFraccionada estadoFracciones = Get.find<EstadoVentaFraccionada>();
-  Fracciones fracciones = estadoFracciones.fraccionesConsultadas;
-  List controlador = estadoFracciones.controladoresFraccion;
-  controlador[0].text = enBlancoSiEsCero(fracciones.cantidad).toString();
-  controlador[1].text = fracciones.nombre;
-  controlador[17].text = enBlancoSiEsCero(fracciones.cantidad);
-  controlador[18].text = enBlancoSiEsCero(fracciones.bodega1);
-  controlador[19].text = enBlancoSiEsCero(fracciones.bodega2);
-  controlador[20].text = enBlancoSiEsCero(fracciones.bodega3);
-  controlador[21].text = enBlancoSiEsCero(fracciones.bodega4);
-  controlador[22].text = enBlancoSiEsCero(fracciones.bodega5);
 }

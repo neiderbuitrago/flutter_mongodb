@@ -12,7 +12,7 @@ import 'flotante_fracciones.dart';
 import 'stilo_de_pantalla.dart';
 import 'texfield.dart';
 
-Row encabTotalNumero(conteo, totalfactura) {
+Row encabTotalNumero(conteo) {
   EstadoVentas estadoVentas = Get.find<EstadoVentas>();
   String codigoBarras = "";
   return Row(
@@ -55,14 +55,16 @@ Row encabTotalNumero(conteo, totalfactura) {
           ),
           child: Stack(
             children: [
-              Text(
-                "\$ ${puntosDeMil(totalfactura.toString())}",
-                style: TextStyle(
-                  fontSize: tamanoletraMediano(estadoVentas.context) + 5,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.black,
+              Obx(
+                () => Text(
+                  "\$ ${puntosDeMil(quitarDecimales(estadoVentas.totalFactura.value))}",
+                  style: TextStyle(
+                    fontSize: tamanoletraMediano(estadoVentas.context) + 5,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.black,
+                  ),
                 ),
-              ),
+              )
             ],
           ),
         ),
@@ -172,10 +174,11 @@ Row parmetrosEncabezado(context) {
       ),
       Obx(
         () => Visibility(
-          visible: (estadoVentas.productoEnFacturacion.isEmpty)
+          visible: (estadoVentas.productosEnFacturacion.isEmpty)
               ? false
               : estadoVentas
-                  .productoEnFacturacion[estadoVentas.indexProductoSelecc.value]
+                  .productosEnFacturacion[
+                      estadoVentas.indexProductoSelecc.value]
                   .producto
                   .manejaFracciones,
           child: Padding(
@@ -202,7 +205,7 @@ Row parmetrosEncabezado(context) {
                   context: estadoVentas.context,
                   coleccion: "fracciones",
                 ).then((value) {
-                  estadoVentas.colocarValoresDeFracciones();
+                  estadoVentas.agregarFraccionFacturacion();
                 });
               },
             ),

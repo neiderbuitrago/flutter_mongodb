@@ -60,7 +60,7 @@ class _VentasState extends State<Ventas> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(bottom: 8),
-                        child: encabTotalNumero(1, 10000),
+                        child: encabTotalNumero(1),
                       ),
                       parmetrosEncabezado(context),
                       const Flexible(

@@ -24,3 +24,27 @@ bool existe(String elemento, List lista) {
   }
   return false;
 }
+
+tituloValorRow({
+  required String valor,
+  required String titulo,
+}) {
+  style(bool negro) => TextStyle(
+      color: negro ? Colors.black : Colors.black54,
+      fontWeight: FontWeight.bold,
+      fontSize: 16);
+
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      Text(
+        titulo,
+        style: style(false),
+      ),
+      Text(
+        valor,
+        style: style(true),
+      ),
+    ],
+  );
+}

@@ -6,15 +6,12 @@ import 'package:flutter_mongodb/db/marcas_mongo.dart';
 import 'package:flutter_mongodb/db/presentacion.dart';
 import 'package:flutter_mongodb/db/productos_mongo.dart';
 import 'package:flutter_mongodb/db/venta_x_cantida_mongo.dart';
-import 'package:flutter_mongodb/modelos/fracciones.dart';
 
 import 'package:get/get.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import '../../db/combo.dart';
-import '../../db/fracciones.dart';
 import '../../db/grupos_mongo.dart';
 import '../../db/tarifa_impuestos_mongo.dart';
-import '../../estado_getx/fracciones_getx.dart';
 import '../../estado_getx/productos_getx.dart';
 import '../../estado_getx/venta_x_cantidad_getx.dart';
 import '../../funciones_generales/numeros.dart';
@@ -114,41 +111,6 @@ llenarDatos({
             };
     },
   );
-}
-
-llenarFracciones(ObjectId id) {
-  EstadoVentaFraccionada estadoFracciones = Get.find<EstadoVentaFraccionada>();
-  List controlador = estadoFracciones.controladoresFraccion;
-  FraccionesDB.getIdPadre(id).then((value1) {
-    if (value1 != null) {
-      List<Fracciones> lista = value1.forEach((element) {
-        (Fracciones.fromMap(element));
-      }).toList();
-
-      estadoFracciones.nuevoEditar.value = false;
-      controlador[0].text = lista[0].cantidadXEmpaque.toString();
-      controlador[11].text = enBlancoSiEsCero(lista[0].cantidad);
-      controlador[6].text = enBlancoSiEsCero(lista[0].bodega1);
-      controlador[7].text = enBlancoSiEsCero(lista[0].bodega2);
-      controlador[8].text = enBlancoSiEsCero(lista[0].bodega3);
-      controlador[9].text = enBlancoSiEsCero(lista[0].bodega4);
-      controlador[10].text = enBlancoSiEsCero(lista[0].bodega5);
-      for (int i = 0; i < lista.length; i++) {
-        if (i == 0) {
-          controlador[1].text = lista[i].codigo;
-          controlador[2].text = lista[i].nombre;
-          controlador[3].text = lista[i].cantidadDescontar.toString();
-          controlador[4].text = lista[i].precio.toString();
-        }
-      }
-      estadoFracciones.calcularGanancias();
-    } else {
-      for (var element in controlador) {
-        element.text = '';
-      }
-      estadoFracciones.nuevoEditar.value = true;
-    }
-  });
 }
 
 llenarVentaXCantidad(ObjectId id) {

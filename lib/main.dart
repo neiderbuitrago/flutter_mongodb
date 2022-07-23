@@ -22,7 +22,7 @@ import 'db/tarifa_impuestos_mongo.dart';
 import 'db/venta_x_cantida_mongo.dart';
 import 'estado_getx/combos_getx.dart';
 import 'estado_getx/fracciones_getx.dart';
-import 'estado_getx/grupos_getx .dart';
+import 'estado_getx/grupos_getx.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

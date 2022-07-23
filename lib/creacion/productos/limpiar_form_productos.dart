@@ -2,7 +2,6 @@ import 'package:get/get.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
 import '../../estado_getx/combos_getx.dart';
-import '../../estado_getx/fracciones_getx.dart';
 import '../../estado_getx/productos_getx.dart';
 import '../../estado_getx/identificadores.dart';
 import '../../estado_getx/venta_x_cantidad_getx.dart';

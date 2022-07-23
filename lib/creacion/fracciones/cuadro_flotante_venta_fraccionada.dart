@@ -1,14 +1,12 @@
-// ignore_for_file: avoid_print
-
 import 'package:flutter/material.dart';
 import 'package:flutter_mongodb/creacion/fracciones/widget_fracciones.dart';
 
-import 'package:flutter_mongodb/creacion/productos/llenar_datos.dart';
 import 'package:flutter_mongodb/estado_getx/productos_getx.dart';
 import 'package:get/get.dart';
 import '../../estado_getx/fracciones_getx.dart';
 import '../../funciones_generales/response.dart';
 import '../widget.dart';
+import 'lista_fracciones.dart';
 
 Future<dynamic> listaFlotanteFracciones({required BuildContext context}) {
   return showDialog(
@@ -16,7 +14,7 @@ Future<dynamic> listaFlotanteFracciones({required BuildContext context}) {
     context: context,
     builder: (context) {
       return const Dialog(
-        backgroundColor: Color.fromARGB(255, 255, 255, 255),
+        backgroundColor: Color.fromARGB(255, 250, 248, 248),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(20.0)),
         ),
@@ -45,13 +43,6 @@ class _ListaSeleccionState extends State<ListaSeleccion> {
 
   late List<List<Widget>> listaDewidgetParaCard = [];
 
-  @override
-  void initState() {
-    llenarFracciones(estadoProducto.productoConsultado.id);
-
-    super.initState();
-  }
-
   Row encabezado(
     contexto1,
     double anchoLista,
@@ -60,7 +51,8 @@ class _ListaSeleccionState extends State<ListaSeleccion> {
       children: [
         IconButton(
           onPressed: () {
-            Navigator.of(contexto1).pop();
+            Navigator.of(contexto1)
+                .pop(estadoVentaFraccionada.fraccionesConsultadas.isNotEmpty);
           },
           icon: const Icon(Icons.arrow_back_ios),
         ),
@@ -130,6 +122,8 @@ class _ListaSeleccionState extends State<ListaSeleccion> {
 
   @override
   Widget build(BuildContext context) {
+    estadoVentaFraccionada.context = context;
+
     llenaListaWidget();
 
     estadoVentaFraccionada.calcularGanancias();
@@ -137,42 +131,94 @@ class _ListaSeleccionState extends State<ListaSeleccion> {
 
     return SizedBox(
       width: medidas.anchoLista,
-      height: medidas.alto * 0.8 - MediaQuery.of(context).viewInsets.bottom,
+      height: medidas.alto * 0.65 - MediaQuery.of(context).viewInsets.bottom,
       child: Column(
         children: [
           encabezado(context, medidas.anchoLista),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              const SizedBox(
-                width: 160,
-                child: TexfieldFracciones(labelText: 'Can X Empaque', index: 0),
-              ),
-              //boton de guardar
-              elevatedButtonGuardar1(
-                  context: context,
-                  focusNode: estadoVentaFraccionada.focofracciones[12],
-                  onPressed: () {
-                    estadoVentaFraccionada.guardarFracciones(
-                        context, estadoProducto.productoConsultado.id);
-                  }),
-            ],
-          ),
-          Expanded(
-            child: SizedBox(
-              width: medidas.anchoLista,
-              height: medidas.alto * 0.8 -
-                  112 -
-                  MediaQuery.of(context).viewInsets.bottom,
-              child: ListView(
+          Obx(() => Row(
+                mainAxisAlignment:
+                    estadoVentaFraccionada.vistaCrearDetalles.value
+                        ? MainAxisAlignment.spaceEvenly
+                        : MainAxisAlignment.center,
                 children: [
-                  cantidadFracciones(medidas: medidas),
-                  listWrap(medidas),
+                  Obx(
+                    () => Visibility(
+                      visible: estadoVentaFraccionada.vistaCrearDetalles.value,
+                      child: const SizedBox(
+                        width: 160,
+                        child: TexfieldFracciones(
+                            labelText: 'Can X Empaque', index: 0),
+                      ),
+                    ),
+                  ),
+
+                  Center(
+                    child: FloatingActionButton(
+                        backgroundColor: Colors.white,
+                        onPressed: () {
+                          estadoVentaFraccionada.vistaCrearDetalles.value =
+                              !estadoVentaFraccionada.vistaCrearDetalles.value;
+                        },
+                        child: Obx(() => Icon(
+                            !estadoVentaFraccionada.vistaCrearDetalles.value
+                                ? Icons.add_circle_outline_rounded
+                                : Icons.library_books_rounded,
+                            size: tamanoIconos(context),
+                            color: Colors.black))),
+                  ),
+                  Obx(
+                    () => (estadoVentaFraccionada.vistaCrearDetalles.value)
+                        ? FloatingActionButton(
+                            backgroundColor: Colors.white,
+                            onPressed: () {
+                              if (!estadoVentaFraccionada.nuevoEditar.value) {
+                                estadoVentaFraccionada
+                                    .eliminarFraccion(context);
+                              }
+                            },
+                            child: Icon(Icons.delete_forever_rounded,
+                                size: tamanoIconos(context),
+                                color: Colors.black))
+                        : const SizedBox(width: 0),
+                  ),
+
+                  //boton de guardar
+                  Obx(
+                    () => Visibility(
+                      visible: estadoVentaFraccionada.vistaCrearDetalles.value,
+                      child: elevatedButtonGuardar1(
+                          context: context,
+                          focusNode: estadoVentaFraccionada.focofracciones[12],
+                          onPressed: () {
+                            estadoVentaFraccionada.guardarFracciones(
+                                context, estadoProducto.productoConsultado.id);
+                          }),
+                    ),
+                  )
                 ],
+              )),
+          Obx(
+            () => Visibility(
+              visible: estadoVentaFraccionada.vistaCrearDetalles.value,
+              child: Expanded(
+                child: SizedBox(
+                  width: medidas.anchoLista,
+                  height: medidas.alto * 0.8 -
+                      112 -
+                      MediaQuery.of(context).viewInsets.bottom,
+                  child: ListView(
+                    children: [
+                      cantidadFracciones(medidas: medidas),
+                      listWrap(medidas),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
-          Column(children: const [])
+          Obx(() => Visibility(
+              visible: !estadoVentaFraccionada.vistaCrearDetalles.value,
+              child: const Expanded(child: ListaFracciones())))
         ],
       ),
     );

@@ -5,15 +5,11 @@ import 'package:flutter_mongodb/db/productos_mongo.dart';
 import 'package:get/get.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
-import '../../db/fracciones.dart';
 import '../../db/venta_x_cantida_mongo.dart';
-import '../../estado_getx/fracciones_getx.dart';
 import '../../estado_getx/productos_getx.dart';
-
 import '../../estado_getx/venta_x_cantidad_getx.dart';
 import '../../funciones_generales/alertas_mensajes.dart';
 import '../../funciones_generales/numeros.dart';
-import '../../modelos/fracciones.dart';
 import '../../modelos/productos.dart';
 import '../../modelos/venta_x_cantidad.dart';
 import '../widget.dart';
@@ -109,9 +105,8 @@ class BotonGuardar extends StatelessWidget {
               : await ProductosDB.actualizar(productoAGuardar).then((value) {
                   if (value) {
                     limpiarTextos(index: 0);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Producto Actualizado')),
-                    );
+                    scaffoldMessenger(
+                        context: context, mensaje: 'Producto Actualizado');
                   } else {
                     informarInferior(
                       titleText: 'Error al guardar',

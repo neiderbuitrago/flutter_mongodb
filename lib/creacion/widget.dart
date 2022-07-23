@@ -3,8 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mongodb/db/productos_mongo.dart';
 
-import 'package:get/get.dart';
-
 import '../funciones_generales/alertas_mensajes.dart';
 
 Future<int> nuevoCodigostring() async {

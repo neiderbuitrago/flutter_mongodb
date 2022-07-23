@@ -217,3 +217,9 @@ informarInferior({required String titleText, required String messageText}) {
     ],
   );
 }
+
+scaffoldMessenger({required BuildContext context, required String mensaje}) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text(mensaje)),
+  );
+}

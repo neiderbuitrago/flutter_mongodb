@@ -1,15 +1,13 @@
 // ignore_for_file: unrelated_type_equality_checks
 
 import 'package:flutter/material.dart';
-import 'package:flutter_mongodb/creacion/validation_function.dart';
 import 'package:flutter_mongodb/modelos/productos.dart';
 import 'package:flutter_mongodb/modelos/ventas.dart';
 import 'package:get/get.dart';
 import 'package:mongo_dart/mongo_dart.dart';
-
-import '../db/fracciones.dart';
 import '../db/identificadores.dart';
 import '../db/venta_x_cantida_mongo.dart';
+import '../funciones_generales/numeros.dart';
 import '../modelos/fracciones.dart';
 import '../modelos/identificador.dart';
 import '../modelos/venta_x_cantidad.dart';
@@ -25,20 +23,20 @@ class EstadoVentas extends GetxController {
   var precioventa = 0.0.obs;
   var cantidad = 0.0.obs;
   var indexProductoSelecc = 0.obs;
+  var totalFactura = 0.0.obs;
 
   //variable para saber cuantos productos se agregaron por fracciones
 
-  List<ProductosEnVenta> productoEnFacturacion = <ProductosEnVenta>[].obs;
+  List<ProductosEnVenta> productosEnFacturacion = <ProductosEnVenta>[].obs;
   VentaXCantidad ventaXCantidad = VentaXCantidad(id: ObjectId());
-  late Fracciones fraccionesConsultadas = {}.obs as Fracciones;
-
+  List<Fracciones> fraccionesConsultadas = <Fracciones>[].obs;
 //identificadores
   List<IdentificadorDetalle> mapIdentificador = <IdentificadorDetalle>[].obs;
 
   //fracciones
   List<TextEditingController> controlFracciones = <TextEditingController>[].obs;
   List<FocusNode> focusFracciones = <FocusNode>[].obs;
-  var listafracciones = [].obs;
+  List<FraccionesEnVenta> listafracciones = <FraccionesEnVenta>[].obs;
   cargarParametros(producto) async {
     cantidad.value = producto.cantidad;
 
@@ -48,12 +46,12 @@ class EstadoVentas extends GetxController {
         ventaXCantidad = VentaXCantidad.fromMap(venta[0]);
       }
     }
-    if (producto.manejaFracciones) {
-      var fraccion = await FraccionesDB.getId(producto.id);
-      if (fraccion != null) {
-        fraccionesConsultadas = Fracciones.fromMap(fraccion[0]);
-      }
-    }
+    // if (producto.manejaFracciones) {
+    //   var fraccion = await FraccionesDB.getId(producto.id);
+    //   if (fraccion != null) {
+    //     fraccionesConsultadas = Fracciones.fromMap(fraccion[0]);
+    //   }
+    // }
     if (producto.manejaIdentificador) {
       var identificador = await IdentificadorDB.getId(producto.id);
       if (identificador != null) {
@@ -65,78 +63,99 @@ class EstadoVentas extends GetxController {
   agregarAVentas({
     required Productos producto,
     bool? ventaDeFracciones,
+    double? precioVenta,
+    FraccionesEnVenta? fracciones,
   }) async {
-    controladores.add(TextEditingController());
-    controladores.add(TextEditingController());
-    controladores.add(TextEditingController());
+    controladores.addAll([
+      TextEditingController(),
+      TextEditingController(),
+      TextEditingController(),
+    ]);
+
+    focusNode.addAll([
+      FocusNode(),
+      FocusNode(),
+      FocusNode(),
+    ]);
 
     ProductosEnVenta productoEnVenta = ProductosEnVenta(
       id: producto.id,
       producto: producto,
       cantidad: 1,
-      precioUnd: producto.precioVenta1,
-      subtotal: producto.precioVenta1,
+      precioUnd: precioVenta ?? producto.precioVenta1,
+      subtotal: precioVenta ?? producto.precioVenta1,
       total: producto.precioVenta1,
       descuento: 0,
       comision: 0,
       impuesto: 0,
       ventaDeFracciones: ventaDeFracciones ?? false,
+      fracciones: fracciones,
     );
-    productoEnFacturacion.add(productoEnVenta);
-    indexProductoSelecc.value = productoEnFacturacion.length - 1;
+    productosEnFacturacion.add(productoEnVenta);
+    indexProductoSelecc.value = productosEnFacturacion.length - 1;
+    actualizarTotal();
 
-    pintarCantidades();
     cargarParametros(producto);
     update();
   }
 
-  pintarCantidades() {
-    for (int i = 0; i < productoEnFacturacion.length; i++) {
-      controladores[i * 3].text =
-          quitarDecimales(productoEnFacturacion[i].cantidad);
+//AGREGAR FRACCIONES A PRODUCTOS EN FACTURACION
+  agregarFraccionFacturacion() {
+    int cantidadProductosAgregar = -1;
+    int indice =
+        indicerevez(indexProductoSelecc.value, productosEnFacturacion.length);
+    for (var element in listafracciones) {
+      var a = productosEnFacturacion[indexProductoSelecc.value];
+      a.ventaDeFracciones = false;
 
-      controladores[i * 3 + 1].text =
-          quitarDecimales(productoEnFacturacion[i].precioUnd);
+      if (element.temCantidad > 0 && element.temCantidad != "") {
+        cantidadProductosAgregar++;
+        //fraccion agregada a productos en facturacion
 
-      controladores[i * 3 + 2].text =
-          quitarDecimales(productoEnFacturacion[i].subtotal);
+        if (cantidadProductosAgregar < 1) {
+          a.fracciones = element;
+          a.cantidad = element.temCantidad;
+          a.precioUnd = element.temPrecioVenta;
+          a.subtotal = element.temCantidad * element.temPrecioVenta;
+          a.ventaDeFracciones = true;
+        }
+
+        //agregar producto a ventas y agregar los datos de la fraccion.
+        if (cantidadProductosAgregar > 0) {
+          agregarAVentas(producto: a.producto, ventaDeFracciones: true);
+          indexProductoSelecc.value = productosEnFacturacion.length - 1;
+          var b = productosEnFacturacion[indexProductoSelecc.value];
+          b.fracciones = element;
+          b.cantidad = element.temCantidad;
+          b.precioUnd = element.temPrecioVenta;
+          b.subtotal = element.temCantidad * element.temPrecioVenta;
+          b.ventaDeFracciones = true;
+        }
+      }
+      actualizarsubtotal(indexOri: indice);
+      update();
     }
   }
 
-  colocarValoresDeFracciones() {
-    int cantidadProductosAgregar = -1;
-    for (int i = 0; i < controlFracciones.length; i++) {
-      if (((i == 0) || (i == 2) || (i == 4) || (i == 6)) &&
-          controlFracciones[i].text.isNotEmpty) {
-        cantidadProductosAgregar++;
-        int indicelista = (i == 0)
-            ? 0
-            : (i == 2)
-                ? 1
-                : (i == 4)
-                    ? 2
-                    : 3;
-        listafracciones[indicelista]["cantidadPaquetes"] =
-            double.parse(controlFracciones[i].text);
-        //cambiar precio
-        listafracciones[indicelista]["precio"] =
-            double.parse(controlFracciones[i + 1].text);
-        //cambiar en productoEnFacturacion la ventaDeFracciones a true
-        productoEnFacturacion[indexProductoSelecc.value].ventaDeFracciones =
-            true;
-      }
+  actualizarsubtotal({required int indexOri}) {
+    int indiceRevez = indicerevez(indexOri, productosEnFacturacion.length);
+    productosEnFacturacion[indiceRevez].subtotal =
+        productosEnFacturacion[indiceRevez].cantidad *
+            productosEnFacturacion[indiceRevez].precioUnd;
+
+    controladores[indexOri * 3 + 2].text = puntosDeMil(
+        quitarDecimales((productosEnFacturacion[indiceRevez].subtotal)));
+
+    actualizarTotal();
+  }
+
+  //suma total de todos los productos
+  double actualizarTotal() {
+    double total = 0;
+    for (var element in productosEnFacturacion) {
+      total += element.subtotal;
     }
-
-//agregar map
-
-    //agregar producto si falta a lista  de productosEnFacturacion
-
-    for (int i = 0; i < cantidadProductosAgregar; i++) {
-      agregarAVentas(
-          producto: productoEnFacturacion[indexProductoSelecc.value].producto,
-          ventaDeFracciones: true);
-    }
-
-    update();
+    totalFactura.value = total;
+    return total;
   }
 }

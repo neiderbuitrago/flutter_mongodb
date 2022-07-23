@@ -18,15 +18,15 @@ class ListaProductosVenta extends GetView<EstadoVentas> {
     return GetBuilder<EstadoVentas>(
       builder: (_) {
         List<ProductosEnVenta> listarevez =
-            _.productoEnFacturacion.reversed.toList();
+            _.productosEnFacturacion.reversed.toList();
 
-        return (_.productoEnFacturacion.isNotEmpty)
+        return (_.productosEnFacturacion.isNotEmpty)
             ? SizedBox(
                 height: 500,
                 child: ListView(
                   children: [
                     lineaDivisora(),
-                    for (int i = 0; i < _.productoEnFacturacion.length; i++)
+                    for (int i = 0; i < _.productosEnFacturacion.length; i++)
                       Column(
                         children: [
                           Padding(
@@ -43,7 +43,9 @@ class ListaProductosVenta extends GetView<EstadoVentas> {
                                       child: SizedBox(
                                         width: 170,
                                         child: Text(
-                                          " ${listarevez[i].producto.nombre}",
+                                          (!listarevez[i].ventaDeFracciones)
+                                              ? " ${listarevez[i].producto.nombre}"
+                                              : " ${listarevez[i].fracciones!.nombre}",
                                           style: const TextStyle(
                                               fontSize: 19,
                                               fontWeight: FontWeight.bold),
@@ -70,7 +72,7 @@ class ListaProductosVenta extends GetView<EstadoVentas> {
                                           child: texFieldParaTablaProductos(
                                             i,
                                             ii,
-                                            30,
+                                            listarevez,
                                           ),
                                         ),
                                       ),
@@ -81,7 +83,7 @@ class ListaProductosVenta extends GetView<EstadoVentas> {
                                     //   (DragStartDetails details)
                                     {
                                   _.indexProductoSelecc.value = indicerevez(
-                                      i, _.productoEnFacturacion.length);
+                                      i, _.productosEnFacturacion.length);
 
                                   _.cargarParametros(listarevez[i].producto);
                                   // dialogoEliminacion(context, i, listarevez)
@@ -128,14 +130,21 @@ class ListaProductosVenta extends GetView<EstadoVentas> {
 TextField texFieldParaTablaProductos(
   int i,
   int ii,
-  double borderRadius,
+  List<ProductosEnVenta> listarevez,
 ) {
   EstadoVentas estadoVentas = Get.find<EstadoVentas>();
   double borderRadius = 30;
+  int index = (i == 0) ? i + ii : i * 3 + ii;
+  estadoVentas.controladores[index].text = (ii == 0)
+      ? quitarDecimales(listarevez[i].cantidad)
+      : (ii == 1)
+          ? quitarDecimales(listarevez[i].precioUnd)
+          : puntosDeMil(quitarDecimales(listarevez[i].subtotal));
   return TextField(
-    controller: estadoVentas.controladores[(i == 0) ? i + ii : i * 3 + ii],
+    style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w600),
+    controller: estadoVentas.controladores[index],
+    focusNode: estadoVentas.focusNode[index],
     keyboardType: TextInputType.number,
-
     textAlign: TextAlign.center,
     readOnly: ii == 2 ? true : false,
     decoration: InputDecoration(
@@ -151,12 +160,36 @@ TextField texFieldParaTablaProductos(
         ),
       ),
     ),
-
-    // onSubmitted: (String textofinal) {
-    //   actualizarSubtotalTotal(i);
-    // },
+    onEditingComplete: () {
+      if (ii == 1) {
+        FocusScope.of(estadoVentas.context)
+            .requestFocus(estadoVentas.focusBuscar);
+      } else {
+        FocusScope.of(estadoVentas.context)
+            .requestFocus(estadoVentas.focusNode[index + 1]);
+      }
+    },
     onChanged: (value) {
-      // actualizarSubtotalTotal(i);
+      int indiceRev = indicerevez(i, listarevez.length);
+      bool esFraccion =
+          estadoVentas.productosEnFacturacion[indiceRev].ventaDeFracciones;
+
+      if (ii == 0) {
+        estadoVentas.productosEnFacturacion[indiceRev].cantidad =
+            numeroDecimal(value);
+        if (esFraccion) {
+          estadoVentas.productosEnFacturacion[indiceRev].fracciones!
+              .temCantidad = numeroDecimal(value);
+        }
+      } else if (ii == 1) {
+        estadoVentas.productosEnFacturacion[indiceRev].precioUnd =
+            numeroDecimal(value);
+        if (esFraccion) {
+          estadoVentas.productosEnFacturacion[indiceRev].fracciones!
+              .temPrecioVenta = numeroDecimal(value);
+        }
+      }
+      estadoVentas.actualizarsubtotal(indexOri: i);
     },
   );
 }

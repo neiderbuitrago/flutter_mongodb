@@ -406,13 +406,10 @@ class _TextFormFieldProductoState extends State<TextFormFieldProducto> {
                   listaFlotanteFracciones(
                     context: context,
                   ).then((value) {
-                    print('El valor que se recupero es $value');
-
-                    if (!comprovarSiHayValores(
-                        5, estadoVentaFraccionada.controladoresFraccion)) {
+                    print(value);
+                    if (estadoVentaFraccionada.fraccionesConsultadas.isEmpty) {
                       estadoProducto.funtionHabilitar(index: widget.index);
                     }
-                    print('este es el valor $value');
                   });
                 },
               );

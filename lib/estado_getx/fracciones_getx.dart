@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_typing_uninitialized_variables
-
 import 'package:flutter/material.dart';
 import 'package:flutter_mongodb/db/fracciones.dart';
 import 'package:flutter_mongodb/db/multicodigo.dart';
@@ -16,9 +14,11 @@ class EstadoVentaFraccionada extends GetxController {
   var costoGeneralProducto = ''.obs;
   var listaBodegasVisibles = false.obs;
   var nuevoEditar = true.obs;
-  var context;
+  var vistaCrearDetalles = false.obs;
+  ObjectId indiceFraccionSeleccionada = ObjectId();
+  late BuildContext context;
 
-  late List<String> camposTitulo = [
+  List<String> camposTitulo = [
     "Codigo",
     'Nombre Producto',
     'Cantidades a descontar',
@@ -26,7 +26,7 @@ class EstadoVentaFraccionada extends GetxController {
     'Utilidad % ',
   ].obs;
 
-  late Fracciones fraccionesConsultadas = {}.obs as Fracciones;
+  List<Fracciones> fraccionesConsultadas = <Fracciones>[].obs;
 
   late List<TextEditingController> controladoresFraccion = [
     for (var i = 0; i < 12; i++) TextEditingController()
@@ -44,13 +44,13 @@ class EstadoVentaFraccionada extends GetxController {
       //pc = precio de compra
       double pc = numeroDecimal(costoGeneralProducto.value);
       //
-      double cantidadDescontar = numeroDecimal(controladoresFraccion[10].text);
+      double cantidadDescontar = numeroDecimal(controladoresFraccion[4].text);
       double costoFraccion = (pc / cxe) * cantidadDescontar;
-      if (controladoresFraccion[10].text != '') {
+      if (controladoresFraccion[5].text != '') {
         double utilidadPesos =
-            (numeroDecimal(controladoresFraccion[10].text) - costoFraccion);
+            (numeroDecimal(controladoresFraccion[5].text) - costoFraccion);
         double porcentaje = (utilidadPesos / costoFraccion);
-        controladoresFraccion[11].text = (porcentaje * 100).toString();
+        controladoresFraccion[6].text = (porcentaje * 100).toString();
       }
     }
   }
@@ -118,7 +118,6 @@ class EstadoVentaFraccionada extends GetxController {
   }
 
   guardarFracciones(BuildContext context, ObjectId idProducto) async {
-    context = context;
     if (controladoresFraccion[3].text != "" &&
         controladoresFraccion[4].text != "" &&
         controladoresFraccion[5].text != "") {
@@ -128,7 +127,7 @@ class EstadoVentaFraccionada extends GetxController {
           codigo: controladoresFraccion[2].text,
           nombre: controladoresFraccion[3].text,
           cantidadDescontar: numeroDecimal(controladoresFraccion[4].text),
-          precio: numeroDecimal(controladoresFraccion[5].text),
+          precioUnd: numeroDecimal(controladoresFraccion[5].text),
           cantidadXEmpaque: numeroDecimal(controladoresFraccion[0].text),
           cantidad: numeroDecimal(controladoresFraccion[1].text),
           bodega1: numeroDecimal(controladoresFraccion[7].text),
@@ -138,14 +137,24 @@ class EstadoVentaFraccionada extends GetxController {
           bodega5: numeroDecimal(controladoresFraccion[11].text));
 
       nuevoEditar.value
-          ? await FraccionesDB.insertar(fracciones)
-              .then((value) => limpiarFracciones())
-          : await FraccionesDB.actualizar(fracciones)
-              .then((value) => limpiarFracciones());
+          ? await FraccionesDB.insertar(fracciones).then((value) {
+              despuesGuardar(context, "Fracción guardada", idProducto);
+            })
+          : await FraccionesDB.actualizar(fracciones).then((value) {
+              despuesGuardar(context, "Fracción actualizada", idProducto);
+            });
     }
   }
 
-  limpiarFracciones() {
+  void despuesGuardar(BuildContext context, String texto, idProducto) {
+    scaffoldMessenger(context: context, mensaje: texto);
+    limpiarFracciones(context);
+    nuevoEditar.value = true;
+    vistaCrearDetalles.value = false;
+    update();
+  }
+
+  limpiarFracciones(context) {
     EstadoProducto estadoProducto = Get.find<EstadoProducto>();
     nuevoEditar.value = true;
     for (var element in controladoresFraccion) {
@@ -153,5 +162,37 @@ class EstadoVentaFraccionada extends GetxController {
     }
     estadoProducto.manejaVentaFraccionada.value = false;
     FocusScope.of(context).requestFocus(focofracciones[0]);
+  }
+
+  actualizar() {
+    update();
+  }
+
+  editarFraccion(Fracciones fracciones) {
+    vistaCrearDetalles.value = true;
+    nuevoEditar.value = false;
+    indiceFraccionSeleccionada = fracciones.id;
+    controladoresFraccion[0].text =
+        enBlancoSiEsCero(fracciones.cantidadXEmpaque).toString();
+    controladoresFraccion[1].text = enBlancoSiEsCero(fracciones.cantidad);
+
+    controladoresFraccion[2].text = fracciones.codigo;
+    controladoresFraccion[3].text = fracciones.nombre;
+    controladoresFraccion[4].text =
+        enBlancoSiEsCero(fracciones.cantidadDescontar).toString();
+    controladoresFraccion[5].text =
+        enBlancoSiEsCero(fracciones.precioUnd).toString();
+    controladoresFraccion[7].text = enBlancoSiEsCero(fracciones.bodega1);
+    controladoresFraccion[8].text = enBlancoSiEsCero(fracciones.bodega2);
+    controladoresFraccion[9].text = enBlancoSiEsCero(fracciones.bodega3);
+    controladoresFraccion[10].text = enBlancoSiEsCero(fracciones.bodega4);
+    controladoresFraccion[11].text = enBlancoSiEsCero(fracciones.bodega5);
+  }
+
+  eliminarFraccion(context) {
+    FraccionesDB.eliminar(indiceFraccionSeleccionada);
+    scaffoldMessenger(context: context, mensaje: "Fracción eliminada");
+
+    update();
   }
 }

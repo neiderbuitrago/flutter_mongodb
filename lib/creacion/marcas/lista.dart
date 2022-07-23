@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_mongodb/db/marcas_mongo.dart';
-import 'package:flutter_mongodb/estado_getx/grupos_getx%20.dart';
+import 'package:flutter_mongodb/estado_getx/grupos_getx.dart';
 import 'package:flutter_mongodb/estado_getx/marcas_getx.dart';
 import 'package:flutter_mongodb/modelos/marcas.dart';
 import 'package:get/get.dart';

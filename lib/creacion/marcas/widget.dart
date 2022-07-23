@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mongodb/db/grupos_mongo.dart';
 import 'package:flutter_mongodb/db/marcas_mongo.dart';
-import 'package:flutter_mongodb/estado_getx/grupos_getx%20.dart';
+import 'package:flutter_mongodb/estado_getx/grupos_getx.dart';
 import 'package:get/get.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import '../../estado_getx/marcas_getx.dart';
