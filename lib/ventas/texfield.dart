@@ -29,7 +29,7 @@ class TextFieldBusqueda extends StatelessWidget {
           (value.isEmpty || value.trim() == "")
               ? cuadroFlotanteBusqueda(context)
               : {
-                  //     print("buscando + ${estadoVentas.controladorBuscar.text}");
+                  //     print("buscar + ${estadoVentas.controladorBuscar.text}");
                   ProductosDB.getcodigo(
                           estadoVentas.controladorBuscar.text.toString())
                       .then(
@@ -174,16 +174,15 @@ texfieldFracciones({
         }
       },
       onChanged: (value) {
-        if (value.isNotEmpty) {
-          if (index % 2 == 0) {
-            estadoVentas.listafracciones[indexFraccion(index)].temCantidad =
-                numeroDecimal(value);
-          } else {
-            estadoVentas.listafracciones[indexFraccion(index)].temPrecioVenta =
-                numeroDecimal(value);
-            print(
-                "precio venta ${estadoVentas.listafracciones[indexFraccion(index)].temPrecioVenta}");
-          }
+        if (index % 2 == 0) {
+          estadoVentas.listafracciones[indexFraccion(index)].temCantidad =
+              numeroDecimal(value);
+          print(indexFraccion(index));
+        } else {
+          estadoVentas.listafracciones[indexFraccion(index)].temPrecioVenta =
+              numeroDecimal(value);
+          print(
+              "precio venta ${estadoVentas.listafracciones[indexFraccion(index)].temPrecioVenta}");
         }
       },
       onTap: (() => print(indexFraccion(index))),
@@ -202,4 +201,55 @@ indexFraccion(int index) {
       return ((index - 1) / 2).round();
     }
   }
+}
+
+texfieldIdentificador({
+  required int index,
+  required context,
+}) {
+  EstadoVentas estadoVentas = Get.find<EstadoVentas>();
+  return Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: TextField(
+      style: const TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      autofocus: index == 0 ? true : false,
+      textAlign: TextAlign.center,
+      controller: estadoVentas.controlIdentificadores[index],
+      focusNode: estadoVentas.focusIdentificadores[index],
+      decoration: InputDecoration(
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          gapPadding: 5,
+        ),
+        focusedBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(30)),
+          borderSide: BorderSide(
+            color: Colors.lightBlueAccent,
+            width: 2,
+          ),
+        ),
+      ),
+      onEditingComplete: () {
+        int cantidad = estadoVentas.focusIdentificadores.length;
+        if (index + 1 < cantidad) {
+          FocusScope.of(context)
+              .requestFocus(estadoVentas.focusIdentificadores[index + 1]);
+        } else {
+          Navigator.of(context).pop();
+        }
+      },
+      onChanged: (value) {
+        {
+          estadoVentas.listaMapIdentificador[index].temCantidad =
+              numeroDecimal(value);
+          print(
+              "precio venta index $index ${estadoVentas.listaMapIdentificador[indexFraccion(index)].temCantidad}");
+        }
+      },
+      inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[0-9-.]'))],
+    ),
+  );
 }

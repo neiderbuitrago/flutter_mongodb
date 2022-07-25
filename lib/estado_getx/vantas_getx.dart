@@ -5,7 +5,7 @@ import 'package:flutter_mongodb/modelos/productos.dart';
 import 'package:flutter_mongodb/modelos/ventas.dart';
 import 'package:get/get.dart';
 import 'package:mongo_dart/mongo_dart.dart';
-import '../db/identificadores.dart';
+
 import '../db/venta_x_cantida_mongo.dart';
 import '../funciones_generales/numeros.dart';
 import '../modelos/fracciones.dart';
@@ -30,13 +30,18 @@ class EstadoVentas extends GetxController {
   List<ProductosEnVenta> productosEnFacturacion = <ProductosEnVenta>[].obs;
   VentaXCantidad ventaXCantidad = VentaXCantidad(id: ObjectId());
   List<Fracciones> fraccionesConsultadas = <Fracciones>[].obs;
-//identificadores
-  List<IdentificadorDetalle> mapIdentificador = <IdentificadorDetalle>[].obs;
+
+  //identificadores
+  List<IdentificadorVenta> listaMapIdentificador = <IdentificadorVenta>[].obs;
+  List<FocusNode> focusIdentificadores = <FocusNode>[].obs;
+  List<TextEditingController> controlIdentificadores =
+      <TextEditingController>[].obs;
 
   //fracciones
   List<TextEditingController> controlFracciones = <TextEditingController>[].obs;
   List<FocusNode> focusFracciones = <FocusNode>[].obs;
   List<FraccionesEnVenta> listafracciones = <FraccionesEnVenta>[].obs;
+
   cargarParametros(producto) async {
     cantidad.value = producto.cantidad;
 
@@ -52,12 +57,12 @@ class EstadoVentas extends GetxController {
     //     fraccionesConsultadas = Fracciones.fromMap(fraccion[0]);
     //   }
     // }
-    if (producto.manejaIdentificador) {
-      var identificador = await IdentificadorDB.getId(producto.id);
-      if (identificador != null) {
-        mapIdentificador = identificador;
-      }
-    }
+    // if (producto.manejaIdentificador) {
+    //   var identificador = await IdentificadorDB.getId(producto.id);
+    //   if (identificador != null) {
+    //     listaMapIdentificador = identificador;
+    //   }
+    // }
   }
 
   agregarAVentas({
@@ -97,6 +102,7 @@ class EstadoVentas extends GetxController {
 
     cargarParametros(producto);
     update();
+    FocusScope.of(context).requestFocus(focusBuscar);
   }
 
 //AGREGAR FRACCIONES A PRODUCTOS EN FACTURACION
@@ -104,12 +110,12 @@ class EstadoVentas extends GetxController {
     int cantidadProductosAgregar = -1;
     int indice =
         indicerevez(indexProductoSelecc.value, productosEnFacturacion.length);
-    for (var element in listafracciones) {
-      var a = productosEnFacturacion[indexProductoSelecc.value];
-      a.ventaDeFracciones = false;
+    var a = productosEnFacturacion[indexProductoSelecc.value];
 
-      if (element.temCantidad > 0 && element.temCantidad != "") {
-        cantidadProductosAgregar++;
+    for (var element in listafracciones) {
+      cantidadProductosAgregar++;
+
+      if (element.temCantidad > 0) {
         //fraccion agregada a productos en facturacion
 
         if (cantidadProductosAgregar < 1) {
@@ -118,6 +124,7 @@ class EstadoVentas extends GetxController {
           a.precioUnd = element.temPrecioVenta;
           a.subtotal = element.temCantidad * element.temPrecioVenta;
           a.ventaDeFracciones = true;
+          update();
         }
 
         //agregar producto a ventas y agregar los datos de la fraccion.
@@ -129,7 +136,43 @@ class EstadoVentas extends GetxController {
           b.cantidad = element.temCantidad;
           b.precioUnd = element.temPrecioVenta;
           b.subtotal = element.temCantidad * element.temPrecioVenta;
-          b.ventaDeFracciones = true;
+          // b.ventaDeFracciones = true;
+        }
+      }
+      actualizarsubtotal(indexOri: indice);
+      update();
+    }
+  }
+
+  agregarIdentificadorVenta() {
+    int cantidadProductosAgregar = -1;
+    int indice =
+        indicerevez(indexProductoSelecc.value, productosEnFacturacion.length);
+
+    var a = productosEnFacturacion[indexProductoSelecc.value];
+    //Limpiar identificador de ventas
+    a.identificadorVenta = null;
+
+    for (var element in listaMapIdentificador) {
+      if (element.temCantidad > 0) {
+        //fraccion agregada a productos en facturacion
+        cantidadProductosAgregar++;
+        if (cantidadProductosAgregar < 1) {
+          a.identificadorVenta = element;
+          a.cantidad = element.temCantidad;
+          // a.identificadorVenta = true;
+          update();
+        }
+
+        //agregar producto a ventas y agregar los datos de la fraccion.
+        if (cantidadProductosAgregar > 0) {
+          agregarAVentas(producto: a.producto);
+          indexProductoSelecc.value = productosEnFacturacion.length - 1;
+          var b = productosEnFacturacion[indexProductoSelecc.value];
+          b.identificadorVenta = element;
+          b.cantidad = element.temCantidad;
+
+          // b.ventaDeFracciones = true;
         }
       }
       actualizarsubtotal(indexOri: indice);

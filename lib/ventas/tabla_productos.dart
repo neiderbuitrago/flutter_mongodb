@@ -21,92 +21,94 @@ class ListaProductosVenta extends GetView<EstadoVentas> {
             _.productosEnFacturacion.reversed.toList();
 
         return (_.productosEnFacturacion.isNotEmpty)
-            ? SizedBox(
-                height: 500,
-                child: ListView(
-                  children: [
-                    lineaDivisora(),
-                    for (int i = 0; i < _.productosEnFacturacion.length; i++)
-                      Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 5.00),
-                            child: GestureDetector(
-                                child: Row(
-                                  children: [
-                                    if (listarevez[i].ventaDeFracciones)
-                                      const Icon(
-                                        Icons.widgets_outlined,
-                                        color: Colors.green,
-                                      ),
-                                    Expanded(
-                                      child: SizedBox(
-                                        width: 170,
-                                        child: Text(
-                                          (!listarevez[i].ventaDeFracciones)
-                                              ? " ${listarevez[i].producto.nombre}"
-                                              : " ${listarevez[i].fracciones!.nombre}",
-                                          style: const TextStyle(
-                                              fontSize: 19,
-                                              fontWeight: FontWeight.bold),
+            ? Expanded(
+                child: SizedBox(
+                  //menos el tamaño del cuadro de busqueda y encabezado
+                  height: (medidas.alto * 0.71),
+                  child: ListView(
+                    children: [
+                      lineaDivisora(),
+                      for (int i = 0; i < _.productosEnFacturacion.length; i++)
+                        Column(
+                          children: [
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 5.00),
+                              child: GestureDetector(
+                                  child: Row(
+                                    children: [
+                                      if (listarevez[i].ventaDeFracciones)
+                                        const Icon(
+                                          Icons.widgets_outlined,
+                                          color: Colors.green,
                                         ),
-                                      ),
-                                    ),
-                                    for (int ii = 0; ii < 3; ii++)
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 1),
-                                        child: Container(
-                                          alignment: const Alignment(0.0, 0.0),
-                                          width: ii == 0
-                                              ? medidas.ancho * 0.14
-                                              : ii == 1
-                                                  ? medidas.ancho * 0.18
-                                                  : medidas.ancho * 0.20,
-                                          height: 39,
-                                          decoration:
-                                              boxdecorationParaContainer(
-                                                  borderRadius: 30,
-                                                  color1: Colors.grey),
-                                          //cuadros de texto para el contenido cantidad valor unitario
-                                          child: texFieldParaTablaProductos(
-                                            i,
-                                            ii,
-                                            listarevez,
+                                      if (listarevez[i].identificadorVenta !=
+                                          null)
+                                        const Icon(
+                                          Icons.polyline_outlined,
+                                          color: Colors.green,
+                                        ),
+                                      Expanded(
+                                        child: SizedBox(
+                                          width: 170,
+                                          child: Text(
+                                            (listarevez[i].ventaDeFracciones)
+                                                ? " ${listarevez[i].fracciones!.nombre}"
+                                                : (listarevez[i]
+                                                            .identificadorVenta !=
+                                                        null)
+                                                    ? " ${listarevez[i].producto.nombre} ${listarevez[i].identificadorVenta?.identificador} "
+                                                    : " ${listarevez[i].producto.nombre}",
+                                            style: const TextStyle(
+                                                fontSize: 19,
+                                                fontWeight: FontWeight.bold),
                                           ),
                                         ),
                                       ),
-                                  ],
-                                ),
-                                onTap: ()
-                                    //onHorizontalDragStart:
-                                    //   (DragStartDetails details)
-                                    {
-                                  _.indexProductoSelecc.value = indicerevez(
-                                      i, _.productosEnFacturacion.length);
+                                      for (int ii = 0; ii < 3; ii++)
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 1),
+                                          child: Container(
+                                            alignment:
+                                                const Alignment(0.0, 0.0),
+                                            width: ii == 0
+                                                ? medidas.ancho * 0.14
+                                                : ii == 1
+                                                    ? medidas.ancho * 0.18
+                                                    : medidas.ancho * 0.20,
+                                            height: 39,
+                                            decoration:
+                                                boxdecorationParaContainer(
+                                                    borderRadius: 30,
+                                                    color1: Colors.grey),
+                                            //cuadros de texto para el contenido cantidad valor unitario
+                                            child: texFieldParaTablaProductos(
+                                              i,
+                                              ii,
+                                              listarevez,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                  onTap: ()
+                                      //onHorizontalDragStart:
+                                      //   (DragStartDetails details)
+                                      {
+                                    _.indexProductoSelecc.value = indicerevez(
+                                        i, _.productosEnFacturacion.length);
 
-                                  _.cargarParametros(listarevez[i].producto);
-                                  // dialogoEliminacion(context, i, listarevez)
-                                  //     .then(
-                                  //   (value) {
-                                  //     if (value != null) {
-                                  //       if (value == "todo") {
-                                  //         // insertarEnVenta(value, true, 10000);
-
-                                  //         // ignore: avoid_print
-                                  //         print(listarevez.length);
-                                  //       } else {
-                                  //         // insertarEnVenta(value, true, value);
-                                  //       }
-                                  //     }
-                                  //   },
-                                  // );
-                                }),
-                          ),
-                          lineaDivisora()
-                        ],
-                      ),
-                  ],
+                                    _.cargarParametros(listarevez[i].producto);
+                                    var produ = _.productosEnFacturacion[i];
+                                    print(produ.producto.nombre);
+                                  }),
+                            ),
+                            lineaDivisora()
+                          ],
+                        ),
+                    ],
+                  ),
                 ),
               )
             : const Center(
@@ -173,12 +175,20 @@ TextField texFieldParaTablaProductos(
       int indiceRev = indicerevez(i, listarevez.length);
       bool esFraccion =
           estadoVentas.productosEnFacturacion[indiceRev].ventaDeFracciones;
+      bool esIdentificador =
+          estadoVentas.productosEnFacturacion[indiceRev].identificadorVenta !=
+              null;
 
       if (ii == 0) {
         estadoVentas.productosEnFacturacion[indiceRev].cantidad =
             numeroDecimal(value);
         if (esFraccion) {
           estadoVentas.productosEnFacturacion[indiceRev].fracciones!
+              .temCantidad = numeroDecimal(value);
+        }
+        //si es identificador se actualiza la cantida del identificador
+        if (esIdentificador) {
+          estadoVentas.productosEnFacturacion[indiceRev].identificadorVenta!
               .temCantidad = numeroDecimal(value);
         }
       } else if (ii == 1) {

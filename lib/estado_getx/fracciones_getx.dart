@@ -122,7 +122,7 @@ class EstadoVentaFraccionada extends GetxController {
         controladoresFraccion[4].text != "" &&
         controladoresFraccion[5].text != "") {
       Fracciones fracciones = Fracciones(
-          id: ObjectId(),
+          id: (nuevoEditar.value) ? ObjectId() : indiceFraccionSeleccionada,
           idProducto: idProducto,
           codigo: controladoresFraccion[2].text,
           nombre: controladoresFraccion[3].text,
@@ -173,8 +173,8 @@ class EstadoVentaFraccionada extends GetxController {
     nuevoEditar.value = false;
     indiceFraccionSeleccionada = fracciones.id;
     controladoresFraccion[0].text =
-        enBlancoSiEsCero(fracciones.cantidadXEmpaque).toString();
-    controladoresFraccion[1].text = enBlancoSiEsCero(fracciones.cantidad);
+        quitarDecimales(fracciones.cantidadXEmpaque).toString();
+    controladoresFraccion[1].text = quitarDecimales(fracciones.cantidad);
 
     controladoresFraccion[2].text = fracciones.codigo;
     controladoresFraccion[3].text = fracciones.nombre;

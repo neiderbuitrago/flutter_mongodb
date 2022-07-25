@@ -143,33 +143,44 @@ Row parmetrosEncabezado(context) {
       ),
 
       //Agregar producto
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        child: GestureDetector(
-          child: Column(
-            children: [
-              Icon(
-                Icons.polyline_outlined,
-                size: tamanoIconos(estadoVentas.context),
+      Obx(
+        () => Visibility(
+          visible: (estadoVentas.productosEnFacturacion.isEmpty)
+              ? false
+              : estadoVentas
+                  .productosEnFacturacion[
+                      estadoVentas.indexProductoSelecc.value]
+                  .producto
+                  .manejaIdentificador,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: GestureDetector(
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.polyline_outlined,
+                    size: tamanoIconos(estadoVentas.context),
+                  ),
+                  Text(
+                    "Identificadores",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: tamanoletraPequeno(estadoVentas.context),
+                    ),
+                    maxLines: 1,
+                  ),
+                ],
               ),
-              Text(
-                "Identificadores",
-                style: TextStyle(
-                  fontWeight: FontWeight.w500,
-                  fontSize: tamanoletraPequeno(estadoVentas.context),
-                ),
-                maxLines: 1,
-              ),
-            ],
+              onTap: () {
+                listaFlotante(
+                  context: estadoVentas.context,
+                  coleccion: "Identificadores",
+                ).then((value) {
+                  estadoVentas.agregarIdentificadorVenta();
+                });
+              },
+            ),
           ),
-          onTap: () {
-            Navigator.of(estadoVentas.context).push(
-              MaterialPageRoute(
-                builder: ((context) => Ventas()),
-                // (context) => Clientes(app: widget.app),
-              ),
-            );
-          },
         ),
       ),
       Obx(

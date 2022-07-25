@@ -151,7 +151,6 @@ class _ListaSeleccionState extends State<ListaSeleccion> {
                       ),
                     ),
                   ),
-
                   Center(
                     child: FloatingActionButton(
                         backgroundColor: Colors.white,
@@ -181,8 +180,6 @@ class _ListaSeleccionState extends State<ListaSeleccion> {
                                 color: Colors.black))
                         : const SizedBox(width: 0),
                   ),
-
-                  //boton de guardar
                   Obx(
                     () => Visibility(
                       visible: estadoVentaFraccionada.vistaCrearDetalles.value,

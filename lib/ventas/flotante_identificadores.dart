@@ -1,49 +1,17 @@
-// ignore_for_file: unrelated_type_equality_checks
-
 import 'package:flutter/material.dart';
-import 'package:flutter_mongodb/db/fracciones.dart';
-import 'package:flutter_mongodb/estado_getx/vantas_getx.dart';
-import 'package:flutter_mongodb/modelos/fracciones.dart';
-
-import 'package:flutter_mongodb/modelos/ventas.dart';
-import 'package:flutter_mongodb/ventas/texfield.dart';
+import 'package:flutter_mongodb/db/identificadores.dart';
 import 'package:get/get.dart';
 
 import '../estado_getx/productos_getx.dart';
+import '../estado_getx/vantas_getx.dart';
 import '../funciones_generales/numeros.dart';
 import '../funciones_generales/response.dart';
-import 'flotante_identificadores.dart';
+import '../modelos/identificador.dart';
+import '../modelos/ventas.dart';
+import 'texfield.dart';
 
-Future<dynamic> listaFlotante({
-  required BuildContext context,
-  required String coleccion,
-}) {
-  return showDialog(
-    barrierColor: Colors.black.withOpacity(0.2),
-    context: context,
-    builder: (context) {
-      return Dialog(
-        backgroundColor: const Color.fromARGB(230, 255, 255, 255),
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(20.0)),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(6),
-          child: (coleccion == "Fracciones")
-              ? ListaSeleccion(
-                  coleccion: coleccion,
-                )
-              : ListaIdentificadores(
-                  coleccion: coleccion,
-                ),
-        ),
-      );
-    },
-  );
-}
-
-class ListaSeleccion extends StatefulWidget {
-  const ListaSeleccion({
+class ListaIdentificadores extends StatefulWidget {
+  const ListaIdentificadores({
     Key? key,
     required this.coleccion,
   }) : super(key: key);
@@ -51,15 +19,23 @@ class ListaSeleccion extends StatefulWidget {
   final String coleccion;
 
   @override
-  State<ListaSeleccion> createState() => _ListaSeleccionState();
+  State<ListaIdentificadores> createState() => _ListaIdentificadoresState();
 }
 
-class _ListaSeleccionState extends State<ListaSeleccion> {
+class _ListaIdentificadoresState extends State<ListaIdentificadores> {
   EstadoProducto estadoProductos = Get.find<EstadoProducto>();
 
   @override
   Widget build(BuildContext context) {
     AnchoDePantalla medidas = anchoPantalla(context);
+    EstadoVentas estadoVentas = Get.find<EstadoVentas>();
+    IdentificadorDB.getParametro(estadoVentas
+            .productosEnFacturacion[estadoVentas.indexProductoSelecc.value]
+            .producto
+            .id)
+        .then((value) {
+      print(value);
+    });
 
     return SizedBox(
       width: medidas.anchoLista,
@@ -97,11 +73,9 @@ class _ListaSeleccionState extends State<ListaSeleccion> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: const [
-              Text("Nombre Fraccion",
+              Text("Identificador",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               Text("Cantidad",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              Text("Precio",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             ],
           ),
@@ -118,18 +92,19 @@ class _ListaSeleccionState extends State<ListaSeleccion> {
 
 Widget lista(context) {
   EstadoVentas estadoVentas = Get.find<EstadoVentas>();
-  print(estadoVentas
-      .productosEnFacturacion[estadoVentas.indexProductoSelecc.value]
-      .fracciones);
+
+  print(
+      "identificador en venta ${estadoVentas.productosEnFacturacion[estadoVentas.indexProductoSelecc.value].identificadorVenta}");
 
   return FutureBuilder(
-    future: FraccionesDB.getIdPadre(estadoVentas
+    future: IdentificadorDB.getParametro(estadoVentas
         .productosEnFacturacion[estadoVentas.indexProductoSelecc.value]
         .producto
         .id),
     builder: (context, snapshot) {
       if (snapshot.hasData) {
-        fraccionEnLista(snapshot.data);
+        //
+        identificadorLista(snapshot.data);
 
         return Expanded(
           child: SizedBox(
@@ -156,26 +131,55 @@ Widget lista(context) {
                       children: [
                         Expanded(
                           flex: 2,
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 7),
-                            child: Text(
-                              snapshot.data[index]["nombre"],
+                          child: ListTile(
+                            title: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(
+                                    snapshot.data[index].identificador,
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: Text(
+                                    "Cant: ${quitarDecimales(snapshot.data[index].cantidad)}",
+                                    style: const TextStyle(
+                                      fontSize: 19,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            subtitle: Text(
+                              snapshot.data[index].nombre,
                               style: const TextStyle(
-                                fontSize: 20,
+                                fontSize: 15,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
+
+                          // Padding(
+                          //   padding: const EdgeInsets.only(left: 7),
+                          //   child: Text(
+                          //     "${snapshot.data[index].identificador}",
+                          //     style: const TextStyle(
+                          //       fontSize: 20,
+                          //       fontWeight: FontWeight.bold,
+                          //     ),
+                          //   ),
+                          // ),
                         ),
                         Expanded(
-                          child: texfieldFracciones(
-                            index: index * 2,
-                            context: context,
-                          ),
-                        ),
-                        Expanded(
-                          child: texfieldFracciones(
-                            index: (index * 2) + 1,
+                          child: texfieldIdentificador(
+                            index: index,
                             context: context,
                           ),
                         ),
@@ -197,46 +201,38 @@ Widget lista(context) {
 }
 
 //pintar fracciones para la venta
-fraccionEnLista(List fracciones) {
+identificadorLista(List identificadores) {
   EstadoVentas estadoVentas = Get.find<EstadoVentas>();
-  estadoVentas.listafracciones.clear();
-  estadoVentas.focusFracciones.clear();
-  estadoVentas.controlFracciones.clear();
+  estadoVentas.listaMapIdentificador.clear();
+  estadoVentas.focusIdentificadores.clear();
+  estadoVentas.controlIdentificadores.clear();
   ProductosEnVenta producto = estadoVentas
       .productosEnFacturacion[estadoVentas.indexProductoSelecc.value];
-  for (var element in fracciones) {
+  for (var element in identificadores) {
     //
-    var fraEnVenta = (producto.fracciones?.id == element["_id"] &&
-            producto.ventaDeFracciones)
+    var identificadorEnVent = (producto.identificadorVenta?.id == element.id)
         ? estadoVentas
             .productosEnFacturacion[estadoVentas.indexProductoSelecc.value]
-            .fracciones
+            .identificadorVenta
         : null;
 
-    element.addAll({"temCantidad": 0, "temPrecioVenta": element["precioUnd"]});
-    var fraccionVenta = FraccionesEnVenta(
-      temCantidad: fraEnVenta?.temCantidad ?? 0,
-      temPrecioVenta: fraEnVenta?.temPrecioVenta ?? element["temPrecioVenta"],
-      temSubtotal: fraEnVenta?.temPrecioVenta ?? element["temPrecioVenta"],
+    var identificadorVenta = IdentificadorVenta(
+      temCantidad: identificadorEnVent?.temCantidad ?? 0,
     );
-    // completa la fraccion con los datos par la venta.
-    fraccionVenta.llenarInstancia(Fracciones.fromMap(element));
-    estadoVentas.listafracciones.add(fraccionVenta);
-    estadoVentas.controlFracciones.addAll([
-      TextEditingController(text: enBlancoSiEsCero(fraccionVenta.temCantidad)),
+
+    identificadorVenta.llenarInstancia(element);
+
+    // (Fracciones.fromMap(element)
+
+    estadoVentas.listaMapIdentificador.add(identificadorVenta);
+    estadoVentas.controlIdentificadores.add(
       TextEditingController(
-          text: enBlancoSiEsCero(fraccionVenta.temPrecioVenta))
-    ]);
-    estadoVentas.focusFracciones.addAll([FocusNode(), FocusNode()]);
+          text: enBlancoSiEsCero(identificadorVenta.temCantidad)),
+    );
+    estadoVentas.focusIdentificadores.add(FocusNode());
   }
   producto.ventaDeFracciones = false;
-  producto.fracciones?.temCantidad = 0.0;
-  producto.fracciones?.temPrecioVenta = 0.0;
-  producto.precioUnd = producto.producto.precioVenta1;
-  producto.subtotal = producto.producto.precioVenta1 * producto.cantidad;
   if (estadoVentas.focusFracciones.isNotEmpty) {
     estadoVentas.focusFracciones[0].requestFocus();
   }
 }
-
-EstadoVentas estadoVentas = Get.find<EstadoVentas>();

@@ -41,4 +41,27 @@ class IdentificadorDetalle {
     }
     return map;
   }
+
+  void llenarInstancia(IdentificadorDetalle identificador) {}
+}
+
+class IdentificadorVenta extends IdentificadorDetalle {
+  double temCantidad;
+  IdentificadorVenta({
+    this.temCantidad = 0.0,
+  }) : super(
+          id: ObjectId(),
+          idPadre: ObjectId(),
+          nombre: "",
+          identificador: "",
+          cantidad: 0.0,
+        );
+
+  llenarInstancia(detalle) {
+    id = detalle.id;
+    idPadre = detalle.idPadre;
+    nombre = detalle.nombre;
+    identificador = detalle.identificador;
+    cantidad = detalle.cantidad;
+  }
 }

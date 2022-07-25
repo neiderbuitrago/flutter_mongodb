@@ -2,6 +2,8 @@ import 'package:flutter_mongodb/modelos/fracciones.dart';
 import 'package:flutter_mongodb/modelos/productos.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
+import 'identificador.dart';
+
 class ProductosEnVenta {
   late ObjectId id;
   late Productos producto;
@@ -15,6 +17,7 @@ class ProductosEnVenta {
   late bool ventaDeFracciones;
   int? productosAgregados = 0;
   late FraccionesEnVenta? fracciones;
+  late IdentificadorVenta? identificadorVenta;
 
   ProductosEnVenta({
     required this.id,
@@ -29,6 +32,7 @@ class ProductosEnVenta {
     required this.ventaDeFracciones,
     this.productosAgregados,
     this.fracciones,
+    this.identificadorVenta,
   });
 
   Map<String, dynamic> toJson() => {
@@ -44,6 +48,7 @@ class ProductosEnVenta {
         'ventaDeFracciones': ventaDeFracciones,
         'productosAgregados': productosAgregados,
         'fracciones': fracciones,
+        'identificadorVenta': identificadorVenta,
       };
 
   static ProductosEnVenta fromJson(Map<String, dynamic> json) =>
@@ -60,5 +65,6 @@ class ProductosEnVenta {
         ventaDeFracciones: json['ventaDeFracciones'],
         productosAgregados: json['productosAgregados'],
         fracciones: json['fracciones'],
+        identificadorVenta: json['identificadorVenta'],
       );
 }

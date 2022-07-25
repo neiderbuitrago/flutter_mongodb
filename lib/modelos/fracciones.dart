@@ -112,4 +112,20 @@ class FraccionesEnVenta extends Fracciones {
     bodega4 = fracciones.bodega4;
     bodega5 = fracciones.bodega5;
   }
+
+  clear() {
+    id = ObjectId();
+    idProducto = ObjectId();
+    cantidadXEmpaque = 0.0;
+    codigo = "";
+    nombre = "";
+    cantidadDescontar = 0.0;
+    precioUnd = 0.0;
+    cantidad = 0.0;
+    bodega1 = 0.0;
+    bodega2 = 0.0;
+    bodega3 = 0.0;
+    bodega4 = 0.0;
+    bodega5 = 0.0;
+  }
 }

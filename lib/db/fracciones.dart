@@ -60,10 +60,7 @@ class FraccionesDB {
 
   static Future<void> actualizar(Fracciones value) async {
     try {
-      await coleccion.update(
-        where.eq("_id", value.id),
-        value.toMap(),
-      );
+      await coleccion.update(where.eq("_id", value.id), value.toMap());
     } catch (e) {
       print(e);
     }
